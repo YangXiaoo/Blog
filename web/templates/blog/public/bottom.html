@@ -1,0 +1,21 @@
+<style type="text/css">
+body{ 
+       background-color: transparent; 
+   } 
+</style>
+<script type="text/javascript">
+$(function(){
+	$('body').off('click', '#page-black');
+    $('body').on("click", '#page-black', function(event){
+    document.getElementById("body").style.background = "#000000";  
+    document.getElementById("body").style.alpha  = "100%";
+    document.getElementById("body").style.color = "#555";
+    });
+    $('body').off('click', '#page-white');
+    $('body').on("click", '#page-white', function(event){
+    document.getElementById("body").style.background = "#FFFFFF";  
+    document.getElementById("body").style.alpha  = "0%"; 
+    });
+})
+</script>
+</html>
