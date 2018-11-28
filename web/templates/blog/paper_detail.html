@@ -1,0 +1,80 @@
+{% load common_func %}
+{% include 'blog/public/top.html' %}
+{% include 'blog/public/load_header.html' %}
+<div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title"><span>共{{ page_total }}篇</span></h1>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+
+            <div class="blog-post">
+                <h4 class="blog-post-title">{{ p.title }}</h4>
+                <small class="blog-post-meta text-left">  
+                    <i class="fa fa-clock-o" title="时间：{{ p.data|date:"Y-m-j" }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>&nbsp;
+                    <i class="fa fa-eye" title="浏览：{{ p.views }}" data-toggle="tooltip" > {{ p.views }}
+                    </i>&nbsp;
+                    <i class="fa  fa-commenting-o" title="评论：{{ p.data }}" data-toggle="tooltip">&nbsp;{{ p.comment_total }}
+                    </i>&nbsp;
+                    <i class="fa fa-leaf" title="文章来源：{{ p.source }}" data-toggle="tooltip">{{ p.source }}</i>
+                </small>
+                <hr>
+                {{ p.content }}
+                <br><br>
+                <div class=" pull-left">
+                    <a class="bds_tsina fa fa-weibo" title="分享到新浪微博" data-toggle="tooltip" href="http://service.weibo.com/share/share.php?url={php}echo request()->url(true);{/php}&title={$archive.title}" onclick="window.open(this.href, 'share', 'width=550,height=335');return false;" >
+                        
+                    </a>
+                    <a class="bds_qzone fa fa-star" title="分享到QQ空间" data-toggle="tooltip" href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url={php}echo request()->url(true);{/php}&showcount=1&desc=&summary={$archive.description}&title={$archive.title}&site={:confv('title')}&pics={php}echo request()->domain();{/php}{$archive.litpic}" onclick="window.open(this.href, 'share', 'width=550,height=335');return false;" >
+                        
+                    </a>
+                    <a class="bds_tqq fa fa-tencent-weibo" title="分享到腾讯微博" data-toggle="tooltip" href="http://share.v.t.qq.com/index.php?c=share&a=index&url={php}echo request()->url(true);{/php}&title={$archive.title}&summary={$archive.description}&pics={php}echo request()->domain();{/php}{$archive.litpic}&site={:confv('title')}" onclick="window.open(this.href, 'share', 'width=550,height=335');return false;" >
+                        
+                    </a>
+                    <a class="bds_sqq fa fa-qq" title="分享到QQ好友" data-toggle="tooltip" href="http://connect.qq.com/widget/shareqq/index.html?url={php}echo request()->url(true);{/php}&desc=&title={$archive.title}&summary={$archive.description}&pics={php}echo request()->domain();{/php}{$archive.litpic}&flash=&site={:confv('title')}" onclick="window.open(this.href, 'share', 'width=550,height=335');return false;" >
+                        
+                    </a>
+                </div>
+                <div class="pull-right">
+                    <button class="btn like arc-thumbs-up" type="button" data-id="{{ p.id }}" data-kind="0" title="点赞" data-toggle="tooltip" >
+                        <i class="fa fa-thumbs-o-up"></i>
+                        <span>{{ p.like }}</span>
+                    </button>                        
+                </div>
+                <br>
+                <hr>
+                <div class="arc-next">
+                    {{ p.id|preview }}
+                </div>
+                <hr>
+            </div>
+          <!-- /.blog-post -->
+            <div class="box-body">      
+                <div align="center" style="position: relative;z-index: 1">请先<a href="#">登录</a>，再发表留言。
+                </div>
+            </div>
+
+        </div><!-- /.blog-main -->
+
+        <!-- sidebar -->
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+            <div class="sidebar-module sidebar-module-inset alert alert-warning"  role="alert">
+                <h4>注意！</h4>
+                <p>著作版权归本网站所有，若有侵权，请联系。</p>
+            </div>
+
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-info" >文档分类</h4>{% include 'blog/public/cate.html' %}
+            </div><hr>
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-danger">热门文章</h4>
+                {% include 'blog/public/hot.html' %}
+            </div><hr>
+        </div><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+{% include 'blog/public/bottom.html' %}

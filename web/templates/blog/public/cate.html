@@ -2,7 +2,7 @@
 <ol class="list-unstyled" style="font-size:20px;">
 	{% for c in "-paper_total"|category:10 %}
 	<li>
-		<a href="{% url 'category_detail' %}?id={{ c.id }}">
+		<a href="{% url 'category_detail' %}?cid={{ c.id }}">
 			<span class="label label-info pull-right">
 				{{ c.paper_total }}
 			</span>

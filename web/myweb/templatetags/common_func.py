@@ -12,22 +12,34 @@ from myweb.api import getObject
 @register.filter
 def getConfig(par):
     config = Config.objects.all()
-    if par == 'title':
-    	return config.title
-    elif par == 'keywords':
-    	return conf`ig.keywords
-    elif par == 'description':
-    	return config.description
+    if config:
+        if par == 'title':
+        	return config.title
+        elif par == 'keywords':
+        	return config.keywords
+        elif par == 'description':
+        	return config.description
     return ''
 
 
 @register.filter
 def category(par,nums):
-    c = Category.objects.order_by(str(par))[: nums]
+    cate = Category.objects.order_by(str(par))[: int(nums)]
     return cate
 
 
 @register.filter
 def hot_paper(par,nums):
-    p = Paper.objects.order_by(str(par))[: nums]
+    p = Paper.objects.order_by(str(par))[: int(nums)]
     return p
+
+
+@register.filter
+def paper_list(par,nums=None):
+    p = Paper.objects.filter(cid=int(par))
+    return p
+
+
+@register.filter
+def preview(par,nums=None):
+    return 'None'

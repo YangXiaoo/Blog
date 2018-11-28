@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import ConfigParser
 import getpass
+import tempfile
+
 config = ConfigParser.ConfigParser()
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -74,8 +76,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_crontab',
+    
     'bootstrapform',
     'myweb',
+    'admin',
+    'django_markdown',
 )
 
 MIDDLEWARE_CLASSES = (

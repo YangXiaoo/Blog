@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 # 2018-11-26
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import time
@@ -79,3 +78,8 @@ class Comment(models.Model):
     status = models.BooleanField(default=True)
     like = models.IntegerField(default = 0)
     dislike = models.IntegerField(default = 0)
+
+
+from django_markdown.models import MarkdownField
+class Test(models.Model):
+    content = MarkdownField()

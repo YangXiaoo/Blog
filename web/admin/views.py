@@ -28,7 +28,7 @@ def login(request):
     '''
     error = ''
     if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('admin_index'))
     if request.method == 'GET':
         return render_to_response('login.html')
     else:
@@ -61,11 +61,11 @@ def logout(request):
     return HttpResponseRedirect(reverse('login'))
 
 
-def index(request):
+def admin_index(request):
     '''
     主页
     '''
-    return render_to_response('admin/index.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/admin_index.html', locals(), context_instance=RequestContext(request))
 
 
 def category_list(request):
@@ -85,13 +85,21 @@ def category_add(request):
         cate_secrete = request.POST.get('secrete','')
         cate = Category(category_name=cate_name, description=cate_description, status=cate_status, sorts=cate_sort, secrete=cate_secrete)
         cate.save()
-        return render_to_response('admin/category/category_list.html')
+        return HttpResponseRedirect(reverse('category_list'))
     return render_to_response('admin/category/category_add.html', locals(), context_instance=RequestContext(request))
 
 
 def category_edit(request):
     if request.method == "POST":
-        pass
+        cid = request.POST.get('cid', '')
+        cate_name = request.POST.get('category_name','')
+        cate_description = request.POST.get('decription','')
+        cate_status = request.POST.get('status','')
+        cate_sort = request.POST.get('sorts','')
+        cate_secrete = request.POST.get('secrete','')
+        category = getObject(Category, id=cid)
+        category.update(category_name=cate_name, description=cate_description, status=cate_status, sorts=cate_sort, secrete=cate_secrete)
+        return HttpResponseRedirect(reverse('category_list'))
     elif request.method == "GET":
         cid = request.GET.get('cid', '')
         if cid:
@@ -100,12 +108,29 @@ def category_edit(request):
         cid = request.GET.get('id', '')
         c_name = request.GET.get('name', '')
         category = getObject(Category, id=cid)
-        if c_name not in ['False', 'True']:
+        if c_name not in [False, True]:
             category.category_name = c_name
         else:
             category.status = c_name
         try:
             category.save()
+            status = 1
+            info = 'ok'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
+
+
+def category_del(request):
+    if request.method == "GET":
+        cid = request.GET.get('cid', '')
+        c = getObject(Category, id=cid)
+        try:
+            c.delete()
             status = 1
             info = 'ok'
         except:
@@ -139,8 +164,12 @@ def paper_add(request):
         dislike = request.POST.get('dislike','')
         status = request.POST.get('status','')
         data = request.POST.get('create_time','')
-        paper = Paper(cid=cid, title=title, tag=tag, jumplink=jumplink,litpic=litpic, content=content, author=author, source=source, keywords=keywords, description=description, views=views, like=like, dislike=dislike, status=status, data=data)
+        category = getObject(Category, id=cid).category_name
+        paper = Paper(cid=cid, title=title, category=category,tag=tag, jumplink=jumplink,litpic=litpic, content=content, author=author, source=source, keywords=keywords, description=description, views=views, like=like, dislike=dislike, status=status, data=data)
         paper.save()
+        category = getObject(Category, id=cid)
+        category.paper_total += 1
+        category.save()
         return render_to_response('admin/paper/paper_list.html')
     cate = Category.objects.all()
     return render_to_response('admin/paper/paper_add.html', locals(), context_instance=RequestContext(request))
@@ -166,10 +195,27 @@ def paper_edit(request):
         data = request.POST.get('create_time','')
         paper = getObject(Paper, id=id)
         paper.update(id=id, cid=cid, title=title, tag=tag, jumplink=jumplink,litpic=litpic, content=content, author=author, source=source, keywords=keywords, description=description, views=views, like=like, dislike=dislike, status=status, data=data)
-        return render_to_response('admin/paper/paper_list.html')
+        return HttpResponseRedirect(reverse('paper_list'))
     elif request.method == "GET":
+        name = request.GET.get('name', '')
+        if name:
+            pid = request.GET.gey('id', )
+            paper = getObject(Paper, id=pid)
+            paper.title = name
+            try:
+                paper.save()
+                status = 1
+                info = 'ok'
+            except:
+                status = 0
+                info = 'fail'
+            return HttpResponse(json.dumps({
+                        "status": status,
+                        "info": info
+                    })) 
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
+        cate = Category.objects.all()
     return render_to_response('admin/paper/paper_edit.html', locals(), context_instance=RequestContext(request))
 
 
@@ -188,3 +234,9 @@ def paper_del(request):
                     "status": status,
                     "info": info
                 })) 
+
+
+def test(request):
+    if request.method == "POST":
+        pass
+    return render_to_response('admin/test.html', locals(), context_instance=RequestContext(request))

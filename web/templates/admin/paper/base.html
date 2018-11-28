@@ -11,12 +11,12 @@
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">文章标题</label>
-        <div class="col-sm-7"><input class="form-control" name="title" value="{{ q.title }}" placeholder="标题"></div>
+        <div class="col-sm-7"><input class="form-control" name="title" value="{{ q.title }}" placeholder="{{ q.title }}"></div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">标签</label>
         <div class="col-sm-7">
-            <input class="form-control" name="tag" value="{{ q.tag }}" placeholder="标签">
+            <input class="form-control" name="tag" value="{{ q.tag }}" placeholder="{{ q.tag }}">
         </div>
     </div>
     <div class="form-group {if condition=" !in_array('j', $data['flag']) "}hide{/if}" id="jumplink">
@@ -27,7 +27,7 @@
         <label class="col-sm-2 control-label">缩略图</label>
         <div class="col-sm-7">
             <div class="input-group">
-                <input class="form-control" name="litpic" value="{{ p.litpic }}" placeholder="缩略图" >
+                <input class="form-control" name="litpic" value="{{ p.litpic }}" placeholder="{{ p.litpic }}" >
                 <span class="input-group-btn">
                     <a href="" target="_blank" >
                         <img src="" style="height:34px; width:68px;" />
@@ -41,7 +41,7 @@
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">内容</label>
-        <div class="col-sm-7"><textarea  class="form-control" name="content" placeholder="内容">{{ p.content }}</textarea></div>
+        <div class="col-sm-7"><textarea  class="form-control" name="content" placeholder="{{ p.content }}">{{ p.content }}</textarea></div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">作者</label>

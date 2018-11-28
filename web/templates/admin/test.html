@@ -1,0 +1,12 @@
+{% load staticfiles %}
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    </head>
+    <body>
+        <textarea name="test" id="new"></textarea>
+        {% markdown_editor "#new" %}
+        {% markdown_media %}
+    </body>
+</html>

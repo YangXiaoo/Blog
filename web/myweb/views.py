@@ -33,7 +33,7 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            userinfo = get_object(Users, username=username)
+            userinfo = getObject(Users, username=username)
             if userinfo is not None:
                 if userinfo.is_active == 1:
                     request.session['role_id'] = 0
@@ -56,28 +56,37 @@ def logout(request):
     request.session['role_id'] = ''
     logout(request)
 
-    return HttpResponseRedirect(reverse('blog/index'))
+    return HttpResponseRedirect(reverse('blog/blog_index'))
 
 
-def index(request):
+def blog_index(request):
     '''
     主页
     '''
     papers = Paper.objects.all()
-    return render_to_response('blog/index.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
 
 def category_detail(request):
-    pass
+    if request.method == "GET":
+        cid = request.GET.get('cid', '')
+        category_name = getObject(Category, id=cid).category_name
+        papers = Paper.objects.filter(cid=cid)
+    return render_to_response('blog/category_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def paper_detail(request):
-    pass
+    if request.method == "GET":
+        pid = request.GET.get('pid', '')
+        p = getObject(Paper, id=pid)
+    return render_to_response('blog/paper_detail.html', locals(), context_instance=RequestContext(request))
 
 
-def blog_paper_list(object):
-    pass
+def blog_category_list(request):
+    cate = Category.objects.all()
+    paper_total = len(cate)
+    return render_to_response('blog/blog_category_list.html', locals(), context_instance=RequestContext(request))
 
 
-def blog_search(object):
+def blog_search(request):
     pass

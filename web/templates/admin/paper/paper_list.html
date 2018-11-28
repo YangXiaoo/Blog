@@ -68,8 +68,7 @@
                                         <td>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ p.id }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_edit' %}?pid={{ p.id }}"><i class="fa fa-edit"></i> 编辑</a> 
-                                            <a class="btn btn-danger btn-xs delete" href="javascript:void(0);" data-url="{% url 'paper_del' %}" data-id="1" data-title="删除" ><i class="fa fa-trash"></i> 删除</a> 
-
+                                            <a value="{% url 'paper_del' %}?pid={{ p.id }}" class="btn btn-xs btn-danger file_del">删除</a> 
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -85,6 +84,42 @@
         </div>
         {% include 'admin/public/load_foot.html' %}
     </div>
+<script>
+    $(document).ready(function(){
+        $('.file_del').click(function(){
+            var row = $(this).closest('tr');
+            if (confirm("确定删除")) {
+            $.get(
+                    $(this).attr('value'),
+                    {},
+                    function(data){
+                        row.remove();
+                        alert(data);
+                    }
+            )}
+        });
+    });
+
+    $(function(){
+    $('.editable').editable({
+        emptytext: "empty",
+        params: function(params){
+            var data = {};
+            data['id'] = params.pk
+            data['name'] = params.value
+            return data;
+        },
+        success: function(response, newValue){
+            var res = $.parseJSON(response);
+            if (res.status == 1) {
+
+            }else{
+                return res.info;
+            }
+        }
+    });
+});
+</script>
     {% include 'admin/public/load_bottom.html' %}
 </body>
 </html>
