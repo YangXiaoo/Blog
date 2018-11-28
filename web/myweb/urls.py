@@ -8,5 +8,6 @@ urlpatterns = patterns('myweb.views',
     url(r'^blog/paper_detail/$', 'paper_detail', name='paper_detail'),
     url(r'^blog/category_detail/$', 'category_detail', name='category_detail')
     url(r'^blog/blog_paper_list/$', 'blog_paper_list', name='blog_paper_list')
+    url(r'^blog/blog_search/$', 'blog_search', name='blog_search')
     url(r'^admin/', include('admin.urls')),
 )

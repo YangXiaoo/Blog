@@ -77,3 +77,7 @@ def paper_detail(request):
 
 def blog_paper_list(object):
     pass
+
+
+def blog_search(object):
+    pass
