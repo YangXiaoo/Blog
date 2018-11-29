@@ -49,7 +49,7 @@
                                         <td><input type="checkbox" name="id[]" value="{{ c.id }}" class="minimal"></td>
                                         <td>{{ c.id }}</td>
                                         <td>
-                                            <span class="editable" data-pk="{{ c.id }}" data-name="{{ c.category_name }}" data-url="{% url 'category_edit' %}">{{ c.category_name }}</span>
+                                            <span class="editable" data-pk="{{ c.id }}" data-name="{{ c.category_name }}" data-url="{% url 'category_edit_inline' %}">{{ c.category_name }}</span>
                                         </td>
                                         <td>
                                             {{ c.paper_total }}
@@ -57,10 +57,14 @@
                                         <td>{{ c.data }}</td>
                                         <td>
                                             <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="status" 
-                                            data-value="{{ c.status }}" data-url="{% url 'category_edit' %}"
-                                            class='editimg fa {% ifequal c.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
+                                            data-value="{{ c.status }}" data-url="{% url 'category_edit_inline' %}"
+                                            class='editimg fa {% ifequal c.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'>{{ c.status }}</a>
                                         </td>
-                                        <th>{{ c.secrete }}</th>
+                                        <th>
+                                            <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="secrete" 
+                                            data-value="{{ c.secrete }}" data-url="{% url 'category_edit_inline' %}"
+                                            class='editimg fa {% ifequal c.secrete 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'>{{ c.secrete }}</a>
+                                        </th>
                                         <td>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_add' %}?cid={{ c.id }}"><i class="fa fa-save"></i> 新增文章</a>
 

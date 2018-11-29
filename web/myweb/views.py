@@ -18,6 +18,7 @@ from myweb.settings import MAIL_ENABLE
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+from markdown import markdown
 
 @defendAttack
 def login(request):
@@ -79,6 +80,7 @@ def paper_detail(request):
     if request.method == "GET":
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
+        p.content = markdown(p.content)
     return render_to_response('blog/paper_detail.html', locals(), context_instance=RequestContext(request))
 
 

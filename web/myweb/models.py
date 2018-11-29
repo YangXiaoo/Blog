@@ -35,9 +35,9 @@ class Category(models.Model):
     description = models.CharField(max_length = 100)
     paper_total = models.IntegerField(default = 0)
     data = models.DateField(auto_now=False, auto_now_add=True)
-    status = models.BooleanField(default=True, verbose_name=u"状态")
+    status = models.IntegerField(default = 1, null=True)
     sorts = models.IntegerField(default = 0)
-    secrete  = models.BooleanField(default=False, verbose_name=u"状态")
+    secrete  = models.IntegerField(default = 0, null=True)
 
 
 class Paper(models.Model):
@@ -60,11 +60,11 @@ class Paper(models.Model):
 
     comment_total = models.IntegerField(default = 0, null=True)
     content = models.TextField(null=True)
-    is_jump = models.BooleanField(default=False)
+    is_jump = models.IntegerField(default = 0, null=True)
     jumplink = models.CharField(max_length = 200, null=True)
     litpic = models.CharField(max_length = 200, null=True)
-    top = models.BooleanField(default=False)
-    status = models.BooleanField(default=True, verbose_name=u"状态")
+    top = models.IntegerField(default = 0, null=True)
+    status = models.IntegerField(default = 1, null=True)
 
 
 class Comment(models.Model):
@@ -75,7 +75,7 @@ class Comment(models.Model):
     pcid = models.IntegerField(default = -1, null=True) # 默认无父元素
     content = models.CharField(max_length = 1000, null=False)
     data = models.DateField(auto_now=False, auto_now_add=True)
-    status = models.BooleanField(default=True)
+    status = models.IntegerField(default = 1, null=True)
     like = models.IntegerField(default = 0)
     dislike = models.IntegerField(default = 0)
 

@@ -51,7 +51,7 @@
                                         <td><input type="checkbox" name="id[]" value="{{ p.id }}" class="minimal"></td>
                                         <td>{{ p.id }}</td>
                                         <td>
-                                            <span class="editable" data-pk="{{ p.id }}" data-name="{{ p.title }}" data-url="{% url 'paper_edit' %}">{{ p.title }}</span>
+                                            <span class="editable" data-pk="{{ p.id }}" data-name="{{ p.title }}" data-url="{% url 'paper_edit_inline' %}">{{ p.title }}</span>
                                         </td>
                                         <td>
                                             {{ p.category }}
@@ -61,8 +61,8 @@
                                         <td>{{ p.data }}</td>
                                         <td>{{ p.edit_data }}</td>
                                         <td>
-                                            <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="status" 
-                                            data-value="{{ p.status }}" data-url="{% url 'paper_edit' %}"
+                                            <a href="javascript:void(0);" data-id="{{ p.id }}" data-field="status" 
+                                            data-value="{{ p.status }}" data-url="{% url 'paper_edit_inline' %}"
                                             class='editimg fa {% ifequal p.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
                                         </td>
                                         <td>

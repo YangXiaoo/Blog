@@ -3,7 +3,7 @@
 {% include 'blog/public/load_header.html' %}
 <div class="container">
     <div class="blog-header">
-        <h1 class="blog-title"><span>共{{ page_total }}篇</span></h1>
+        <h1 class="blog-title"><span>{{ p.category }}</span></h1>
     </div>
 
     <div class="row">
@@ -20,7 +20,7 @@
                     <i class="fa fa-leaf" title="文章来源：{{ p.source }}" data-toggle="tooltip">{{ p.source }}</i>
                 </small>
                 <hr>
-                {{ p.content }}
+                {{ p.content|safe }}
                 <br><br>
                 <div class=" pull-left">
                     <a class="bds_tsina fa fa-weibo" title="分享到新浪微博" data-toggle="tooltip" href="http://service.weibo.com/share/share.php?url={php}echo request()->url(true);{/php}&title={$archive.title}" onclick="window.open(this.href, 'share', 'width=550,height=335');return false;" >

@@ -22,7 +22,7 @@
         <div class="col-sm-7">
             <select class="form-control select2" name="status" style="width:100%;">
                 <option value="1" {% ifequal c.status 1 %} selected="selected" {% endifequal %}>开启</option>
-                <option value="0" {% ifequal c.status 1 %} selected="selected" {% endifequal %}>关闭</option>
+                <option value="0" {% ifequal c.status 0 %} selected="selected" {% endifequal %}>关闭</option>
             </select>
         </div>
     </div>
@@ -32,7 +32,7 @@
         <div class="col-sm-7">
             <select class="form-control select2" name="secrete" style="width:100%;">
                 <option value="1" {% ifequal c.secrete 1 %} selected="selected" {% endifequal %}>开启</option>
-                <option value="0" {% ifequal c.secrete 1 %} selected="selected" {% endifequal %}>关闭</option>
+                <option value="0" {% ifequal c.secrete 0 %} selected="selected" {% endifequal %}>关闭</option>
             </select>
         </div>
     </div>
