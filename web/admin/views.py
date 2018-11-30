@@ -16,7 +16,9 @@ from django.db.models import Q
 
 from myweb.api import *
 from myweb.models import *
-from myweb.settings import MAIL_ENABLE
+from myweb.settings import *
+
+from api import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
@@ -74,7 +76,8 @@ def category_list(request):
     """
     文章分类
     """
-    cate = Category.objects.all()
+    cate_find = Category.objects.all()
+    cate_list, p, cate, page_range, current_page, show_first, show_end = pages(cate_find, request)
     return render_to_response('admin/category/category_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -166,7 +169,8 @@ def category_del(request):
 
 
 def paper_list(request):
-    papers = Paper.objects.all()
+    papers_find = Paper.objects.all()
+    paper_list, p, papers, page_range, current_page, show_first, show_end = pages(papers_find, request)
     return render_to_response('admin/paper/paper_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -223,8 +227,6 @@ def paper_edit(request):
     elif request.method == "GET":
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
-        text_maker = ht.HTML2Text()
-        p.content = text_maker.handle(p.content)
         cate = Category.objects.all()
         return render_to_response('admin/paper/paper_edit.html', locals(), context_instance=RequestContext(request))
 
@@ -281,3 +283,66 @@ def test(request):
     if request.method == "POST":
         pass
     return render_to_response('admin/test.html', locals(), context_instance=RequestContext(request))
+
+
+def admin_markdown_upload_image(request):
+    upload_files = request.FILES.getlist('editormd-image-file', None)
+    date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    upload_dir, filename_path = get_tmp_dir()
+    ip = get_client_ip(request)
+    try:
+        url = ''
+        for upload_file in upload_files:
+            file_path = '%s/%s' % (upload_dir, upload_file.name)
+            file_dir = '%s/%s' % (filename_path, upload_file.name)
+            size = upload_file.size
+            up_file = UpFiles(ip=ip,file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
+            up_file.save()
+            with open(file_path,'w') as f:
+                for chunk in upload_file.chunks():
+                    f.write(chunk)
+            url = 'http://www.lxa.kim' + file_path.split(BASE_DIR)[-1]
+        message = 'http://www.lxa.kim/' + str(len(upload_files))
+        success = 1
+    except Exception as e:
+        message = str(e) + str(upload_files)
+        url = 'http://www.lxa.kim/' + 'callback_fail'
+        success = 0
+    return HttpResponse(json.dumps({
+                "success": success,
+                "url" : url,
+                "message":message,
+            }))    
+
+
+def user_list(request):
+    pass
+
+
+
+def paper_comment_list(request):
+    pass
+
+
+def web_config(request):
+    pass
+
+
+def login_log_list(request):
+    pass
+
+
+def view_log_list(request):
+    pass
+
+
+def blogroll_list(request):
+    pass
+
+
+def database_list(request):
+    pass
+
+
+def database_back_list(request):
+    pass

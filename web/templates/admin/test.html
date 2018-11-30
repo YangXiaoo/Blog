@@ -1,30 +1,49 @@
-<div class="wmd-wrapper" id="{{ id }}-wmd-wrapper">
-    <textarea {{ attrs|safe }}>{{ body }}</textarea>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test-markdown</title>
+    <link rel="stylesheet" href="/static/plugins/editor.md/css/editormd.css" />
+</head>
+<body>
+<div id="editormd">
+    <textarea style="display:none;">### Hello Editor.md !</textarea>
 </div>
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="/static/plugins/editor.md/editormd.js"></script>
+
 <script type="text/javascript">
-            var markdownEditor;
-            $(function() {
-                markdownEditor = editormd("{{ id }}-wmd-wrapper", {
-                    width   : "{{markdownconf.width}}",
-                    height  : "{{markdownconf.height}}",
-                    theme :"{{markdownconf.theme}}",
-                    previewTheme : "{{markdownconf.previewTheme}}",
-                    editorTheme : "{{markdownconf.editorTheme}}",
-                    syncScrolling : "{{markdownconf.syncScrolling}}",
-                    saveHTMLToTextarea :  {{markdownconf.saveHTMLToTextarea|lower}},
-                    emoji: {{markdownconf.emoji|lower}},
-                    taskList: {{markdownconf.taskList|lower}},
-                    tocm: {{markdownconf.tocm|lower}},
-                    tex: {{markdownconf.tex|lower}},
-                    flowChart: {{markdownconf.flowChart|lower}},
-                    sequenceDiagram: {{markdownconf.sequenceDiagram|lower}},
-                    codeFold: {{markdownconf.codeFold|lower}},
-                    path    : "{{marklib}}",
-                    {%if markdownconf.imageUpload%}
-                    imageUpload : {{markdownconf.imageUpload|lower}},
-                    imageFormats :{{markdownconf.imageFormats|safe}},
-                    imageUploadURL : "{{markdownconf.imageUploadURL|safe}}",
-                    {%endif%}
-                });
-            });
+    $(function() {
+        var editor = editormd("editormd", {
+
+            width: "98%",
+            height: 730,
+            path : "/static/plugins/editor.md/lib/", // Autoload modules mode, codemirror, marked... dependents libs path
+            codeFold : true,
+            saveHTMLToTextarea : true,
+            searchReplace : true,
+            htmlDecode : "style,script,iframe|on*",
+            emoji : true,
+            taskList : true,
+            tocm : true,         // Using [TOCM]
+            tex : true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart : true,             // 开启流程图支持，默认关闭
+            sequenceDiagram : true,       // 开启时序/序列图支持，默认关闭,
+            imageUpload : true,
+            imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+            imageUploadURL : "{% url 'admin_markdown_upload_image' %}",
+            onload : function() {
+                console.log('onload', this);
+            }
+        });
+
+        /*
+        // or
+        var editor = editormd({
+            id   : "editormd",
+            path : "../lib/"
+        });
+        */
+    });
 </script>
+</body>
+</html>

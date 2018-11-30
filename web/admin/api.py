@@ -2,7 +2,7 @@
 # coding: utf-8
 # 2018-11-26
 
-import os, sys, time
+import os, sys, time, pwd
 import subprocess
 import uuid
 import django
@@ -11,15 +11,15 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
-from settings import *
+
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.mail import send_mail
 from email.mime.text import MIMEText
 from email.utils import formataddr
 from smtplib import SMTP, SMTP_SSL, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
-
-from admin.models import Users
-from admin.settings import MAIL_ENABLE
+ 
+from admin.models import *
+from myweb.settings import *
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myweb.settings'
 
@@ -69,6 +69,7 @@ def colorPrint(msg, color='red', exits=False):
         sys.exit()
     return msg
 
+
 def defendAttack(func):
     def _deco(request, *args, **kwargs):
         if int(request.session.get('visit', 1)) > 10:
@@ -79,3 +80,42 @@ def defendAttack(func):
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
     return _deco
+
+def mkdir(dir_name, username='', mode=755):
+    """
+    目录存在，如果不存在就建立，并且权限正确
+    """
+    cmd = '[ ! -d %s ] && mkdir -p %s && chmod %s %s' % (dir_name, dir_name, mode, dir_name)
+    bash(cmd)
+    if username:
+        chown(dir_name, username)
+
+def chown(path, user, group=''):
+    if not group:
+        group = user
+    try:
+        uid = pwd.getpwnam(user).pw_uid
+        gid = pwd.getpwnam(group).pw_gid
+        os.chown(path, uid, gid)
+    except KeyError:
+        pass
+
+def get_tmp_dir():
+    seed = uuid.uuid4().hex[:4]
+    now = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+    file_path = '%s-%s' % (now, seed)
+    path = os.path.join(BASE_DIR,'static/files')
+    dir_name = os.path.join(path, file_path)
+    mkdir(dir_name, mode=777)
+    return dir_name,file_path
+
+def get_client_ip(request):
+    try:
+        real_ip = request.META['HTTP_X_FORWARDED_FOR']
+        ip = real_ip.split(",")[0]
+    except:
+        try:
+            ip = request.META['REMOTE_ADDR']
+        except:
+            ip = ""
+    return ip

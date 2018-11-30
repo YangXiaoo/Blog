@@ -11,17 +11,17 @@
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">文章标题</label>
-        <div class="col-sm-7"><input class="form-control" name="title" value="{{ q.title }}" placeholder="{{ q.title }}"></div>
+        <div class="col-sm-7"><input class="form-control" name="title" value="{{ p.title }}" placeholder="{{ p.title }}"></div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">标签</label>
         <div class="col-sm-7">
-            <input class="form-control" name="tag" value="{{ q.tag }}" placeholder="{{ q.tag }}">
+            <input class="form-control" name="tag" value="{{ p.tag }}" placeholder="{{ p.tag }}">
         </div>
     </div>
     <div class="form-group {if condition=" !in_array('j', $data['flag']) "}hide{/if}" id="jumplink">
         <label class="col-sm-2 control-label">外部链接</label>
-        <div class="col-sm-7"><input class="form-control" name="jumplink" value="{{ q.jumplink }}" placeholder="{{ q.jumplink }}"></div>
+        <div class="col-sm-7"><input class="form-control" name="jumplink" value="{{ p.jumplink }}" placeholder="{{ p.jumplink }}"></div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">缩略图</label>
@@ -40,8 +40,9 @@
         </div>
     </div>
     <div class="form-group">
-        <label class="col-sm-2 control-label">内容</label>
-        <div class="col-sm-7"><textarea  class="form-control" name="content" placeholder="{{ p.content }}">{{ p.content }}</textarea></div>
+        <div id="editormd">
+            <textarea style="display:none;" name="content">{{ p.content|safe }}</textarea>
+        </div>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">作者</label>

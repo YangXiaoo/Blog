@@ -64,7 +64,11 @@ def blog_index(request):
     '''
     主页
     '''
-    papers = Paper.objects.all()
+    category = Category.objects.filter(status=1)
+    cid = []
+    for c in category:
+        cid.append(c.id)
+    papers = Paper.objects.filter(Q(cid__in=cid)&Q(status=1))
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
 
@@ -80,12 +84,11 @@ def paper_detail(request):
     if request.method == "GET":
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
-        p.content = markdown(p.content)
     return render_to_response('blog/paper_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def blog_category_list(request):
-    cate = Category.objects.all()
+    cate = Category.objects.filter(status=1)
     paper_total = len(cate)
     return render_to_response('blog/blog_category_list.html', locals(), context_instance=RequestContext(request))
 

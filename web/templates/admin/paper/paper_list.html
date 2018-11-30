@@ -13,7 +13,7 @@
         <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    BLOG-ADMIN<small>Version 1.0</small>
+                    文章列表
                 </h1>
                 <ol class="breadcrumb">
                     <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -46,7 +46,7 @@
                                         <th>状态</th>
                                         <th>操作</th>
                                     </tr>
-                                    {% for p in papers %}
+                                    {% for p in papers.object_list %}
                                     <tr>
                                         <td><input type="checkbox" name="id[]" value="{{ p.id }}" class="minimal"></td>
                                         <td>{{ p.id }}</td>
@@ -73,8 +73,11 @@
                                     </tr>
                                     {% endfor %}
                                 </table>
+
                             </div>
-         
+                            <div class="box-footer clearfix">
+                                {% include 'admin/public/paginator.html' %}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -13,7 +13,7 @@
                     </div>
                 </div>
                 <!-- search form -->
-                <form action="#" method="get" class="sidebar-form">
+<!--                 <form action="#" method="get" class="sidebar-form">
                     <div class="input-group">
                         <input type="text" name="q" class="form-control" placeholder="Search...">
                             <span class="input-group-btn">
@@ -22,24 +22,138 @@
                                 </button>
                             </span>
                     </div>
-                </form>
+                </form> -->
                 <!-- /.search form -->
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu" data-widget="tree">
                     <li class="header">MAIN NAVIGATION</li>
+                    <li>
+                        <a href="{% url 'admin_index' %}"><i class="fa fa-home"></i><span>后台首页</span></a>
+                    </li>
 
                     <li class="treeview">
                         <a href="#">
-                            <i class="fa fa-pie-chart"></i>
+                            <i class="fa fa-file-text"></i>
                             <span>博客</span>
                             <span class="pull-right-container">
                                 <i class="fa fa-angle-left pull-right"></i>
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="{% url 'category_list' %}"><i class="fa fa-circle-o"></i> 分类</a></li>
-                            <li><a href="{% url 'paper_list' %}"><i class="fa fa-circle-o"></i> 文章列表</a></li>
-                            <li><a href="{% url 'paper_add' %}"><i class="fa fa-circle-o"></i> 写文章</a></li>
+                            <li>
+                                <a href="{% url 'category_list' %}">
+                                    <i class="fa fa-columns"></i> 分类
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'paper_list' %}">
+                                    <i class="fa fa-file-text-o"></i> 文章列表
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'paper_add' %}">
+                                    <i class="fa fa fa-edit"></i> 写文章
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-users"></i>
+                            <span>用户管理</span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{% url 'user_list' %}"><i class="fa fa-user-o"></i>用户列表
+                                </a>
+                            </li>
+                            <!-- <li><a href="#"><i class="fa fa-vcard"></i>角色管理</a></li> -->
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-comments"></i>
+                            <span>消息管理</span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{% url 'paper_comment_list' %}"><i class="fa fa-user-o"></i>文章评论
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'blog_message_list' %}"><i class="fa fa-user-o"></i>留言列表
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-gear"></i>
+                            <span>系统设置</span>
+                            <span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{% url 'web_config' %}"><i class="fa fa-desktop"></i>站点配置
+                                </a>
+                            </li>
+<!--                             <li>
+                                <a href="{% url '#' %}"><i class="fa fa-user-o"></i>#
+                                </a>
+                            </li> -->
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-wrench"></i>
+                            <span>站长工具</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{% url 'login_log_list' %}">
+                                    <i class="fa fa-location-arrow"></i>登录日志
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'view_log_list' %}">
+                                    <i class="fa fa-user-o"></i>浏览日志
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'blogroll_list' %}">
+                                    <i class="fa fa-link"></i>友情链接
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="treeview">
+                        <a href="javascript:void(0);">
+                            <i class="fa fa-database"></i>
+                            <span>数据库管理</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li>
+                                <a href="{% url 'database_list' %}">
+                                    <i class="fa fa-list"></i>数据库列表
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'database_back_list' %}">
+                                    <i class="fa fa-rotate-left"></i>还原数据库
+                            </li>
                         </ul>
                     </li>
 

@@ -16,3 +16,4 @@ pyte==0.5.2
 sendemail
 selenium
 bs4
+django-simple-captcha 

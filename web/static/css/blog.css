@@ -95,10 +95,6 @@ h6, .h6 {
  * Main column and sidebar layout
  */
 
-.blog-main {
-  font-size: 18px;
-  line-height: 1.5;
-}
 
 /* Sidebar modules for boxing content */
 .sidebar-module {
@@ -149,23 +145,23 @@ h6, .h6 {
 /**
  * blog-main
  */
-div.blog-main p{
+/*div.blog-main p{
   text-indent:2em;
   line-height: 1.5;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
+}*/
 a{
   color: #55bd5e;
   text-decoration: none;
 }
-.blog-main a:hover{
+/*.blog-main a:hover{
   color:#265a19;
   border-bottom: none;
   text-decoration: none;
   font-weight:bold;
   font-size:18px;
   z-index:1000;
-}
+}*/
 .blog-sidebar li > a:hover{
   width: 140px;
   padding: 10px 20px;

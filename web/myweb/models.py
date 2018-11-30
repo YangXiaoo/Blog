@@ -20,9 +20,11 @@ class Users(models.Model):
     password = models.CharField(max_length = 100)
     name = models.CharField(max_length = 100, null=True)
     email = models.CharField(max_length = 100, null=True)
+    third_log = models.IntegerField(default = 0, null=True)
     uuid = models.CharField(max_length = 100)
-    is_admin = models.BooleanField(default=False, verbose_name=u"是否管理员")
-    is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
+    log_total = models.IntegerField(default = 0, null=True)
+    is_admin = models.IntegerField(default = 0, null=True)
+    is_active = models.IntegerField(default = 1, null=True)
     data = models.DateField(auto_now=False, auto_now_add=True)
 
     def __unicode__(self):
