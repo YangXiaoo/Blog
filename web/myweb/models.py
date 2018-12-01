@@ -19,13 +19,17 @@ class Users(models.Model):
     username = models.CharField(max_length = 100)
     password = models.CharField(max_length = 100)
     name = models.CharField(max_length = 100, null=True)
+    gender = models.IntegerField(default = 0, null=True) # 0:man, 1:women
     email = models.CharField(max_length = 100, null=True)
+    profile = models.CharField(max_length = 100, null=True) 
     third_log = models.IntegerField(default = 0, null=True)
     uuid = models.CharField(max_length = 100)
     log_total = models.IntegerField(default = 0, null=True)
     is_admin = models.IntegerField(default = 0, null=True)
     is_active = models.IntegerField(default = 1, null=True)
-    data = models.DateField(auto_now=False, auto_now_add=True)
+    data = models.DateField(auto_now_add=True, null=True)
+    user_info = models.CharField(max_length = 500, null=True)
+    last_login =  models.DateField(auto_now=True, null=True)
 
     def __unicode__(self):
         return self.username
@@ -47,6 +51,7 @@ class Paper(models.Model):
     cid = models.IntegerField(null=False)
     category = models.CharField(max_length = 100)
     title = models.CharField(max_length = 100)
+    attribute = models.CharField(max_length = 10,null=True)
     tag = models.CharField(max_length = 100, null=True)
     keywords = models.CharField(max_length = 100, null=True)
     description = models.CharField(max_length = 500, null=True)

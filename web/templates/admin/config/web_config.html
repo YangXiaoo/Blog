@@ -1,0 +1,112 @@
+{% include 'admin/public/load_top.html' %}
+<body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">    
+        {% include 'admin/public/load_header.html' %}
+        {% include 'admin/public/load_sidebar.html' %}
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>站点配置</h1>
+            </section>
+
+            <section class="content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <form class="form-horizontal" method="POST" action="" onsubmit="return false" >
+                            <input type="hidden" name="id" value="{{ web.id }}" />
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tab1" data-toggle="tab">基本参数</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab1">
+                                        <input type="hidden" name="type" value="web" />
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站标题</label>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="text" name="title" value="{{ web.title }}" placeholder="{{ web.title }}"   />
+                                            </div>
+                                        </div>   
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站LOGO</label>
+                                            <div class="col-sm-7">
+                                                <div class="input-group">
+                                                    <input class="form-control" name="web_logo" value="{{ web.web_logo }}" placeholder="网站LOGO，一般用于导航或底部的LOGO图片"   >
+                                                    <span class="input-group-btn">
+                                                        <a href="{{ web.web_logo }}" target="_blank" >
+                                                            <img src="{{ web.web_logo }} style="height:34px; width:68px;" />
+                                                        </a>
+                                                        <button class="btn btn-success btn-flat upload-btn" type="button" data-url="{% url 'admin_upload_image' %}"  >
+                                                            <i class="fa fa-cloud-upload"> 上传</i>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">站长</label>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="text" name="web_owner" value="{{ web.web_owner }}" placeholder="{{ web.web_owner }}"   />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">归属地</label>
+                                                <div class="col-sm-7">
+                                                    <input class="form-control" type="text" name="address" value="{{ web.address }}" placeholder="{{ web.address }}"   />
+                                                </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站关键字</label>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="text" name="keywords" value="{{ web.keywords }}" placeholder="{{ web.keywords }}"   />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站描述</label>
+                                            <div class="col-sm-7">
+                                                <textarea class="form-control" name="description" placeholder="{{ web.description }}"   style="resize:none;height:155px;" >{{ web.description }}
+                                                </textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站底部信息</label>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="text" name="copyright" value="{{ web.copyright }}" placeholder="{{ web.copyright }}"   />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">网站备案号</label>
+                                            <div class="col-sm-7">
+                                                <input class="form-control" type="text" name="record" value="{{ web.record }}" placeholder="{{ web.record }}"   />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="box-footer">
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-7">
+                                        <div class="btn-group pull-right">
+                                            <button type="submit" class="btn btn-info btn- pull-right submits" data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 提交">提交</button>                            </div>
+                                        <div class="btn-group pull-left">
+                                            <button type="reset" class="btn btn-warning">撤销</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+        {% include 'admin/public/load_foot.html' %}
+    </div>
+    {% include 'admin/public/load_bottom.html' %}
+</body>
+</html>

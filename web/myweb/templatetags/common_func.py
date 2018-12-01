@@ -43,3 +43,10 @@ def paper_list(par,nums=None):
 @register.filter
 def preview(par,nums=None):
     return 'None'
+
+@register.filter
+def get_weblog(par):
+    config = Config.objects.all()
+    if config:
+        return config.web_logo
+    return ''

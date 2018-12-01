@@ -7,6 +7,16 @@
         <label class="col-sm-2 control-label">描述</label>
         <div class="col-sm-7"><textarea class="form-control" style="resize:none;height:155px;" name="description" placeholder="{{ p.description }}">{{ p.description }}</textarea></div>
     </div>
+    
+    <div class="form-group">
+        <label class="col-sm-2 control-label">作者</label>
+        <div class="col-sm-7"><input class="form-control" name="author" value="{{ p.author }}" placeholder="{{ p.author }}"></div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-2 control-label">来源</label>
+        <div class="col-sm-7"><input class="form-control" name="source" value="{{ p.source }}" placeholder="{{ p.source }}"></div>
+    </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">浏览数</label>
         <div class="col-sm-7"><input class="form-control" name="views" value="{{ p.views }}" placeholder="{{ p.views }}"></div>
@@ -31,9 +41,11 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">创建时间</label>
         <div class="col-sm-7">
-            <div class="input-group">
-                <input class="form-control timepicker" name="create_time" value="{{ p.data|date:"Y-m-j" }}" placeholder="{{ p.data|date:"Y-m-j" }}" id="datepicker">
-                <div class="input-group-addon"><i class="fa fa-clock-o"></i></div>
+            <div class="input-group date">
+                <div class="input-group-addon">
+                    <i class="fa fa-calendar"></i>
+                </div>
+                <input class="form-control pull-right" name="create_time" value="{{ p.data|date:"Y-m-j" }}" placeholder="{{ p.data|date:"Y-m-j" }}"  type="text">
             </div>
         </div>
     </div>

@@ -13,10 +13,10 @@
         <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    分类列表
+                    用户列表
                 </h1>
                 <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                    <li><a href="{% url 'admin_index' %}"><i class="fa fa-dashboard"></i> Home</a></li>
                     <li class="active">Dashboard</li>
                 </ol>
             </section>
@@ -29,7 +29,7 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
-                                    <a class="btn btn-primary btn-sm" href="{% url 'category_add' %}"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-primary btn-sm" href="{% url 'user_add' %}"> <i class="fa fa-save"></i> 新增</a> 
                                 </div>
                             </div>
                             <div class="box-body table-responsive">
@@ -37,52 +37,50 @@
                                     <tr>
                                         <th width="35"><input type="checkbox" class="minimal checkbox-toggle"></th>
                                         <th>id</th>
-                                        <th>名称</th>
-                                        <th>文章总数</th>
-                                        <th>创建时间</th>
+                                        <th>头像</th>
+                                        <th>登录用户名</th>
+                                        <th>姓名</th>
+                                        <th>邮箱</th>
+                                        <th>登录次数</th>
+                                        <th>管理员</th>
                                         <th>状态</th>
-                                        <th>隐私</th>
                                         <th>操作</th>
                                     </tr>
-                                    {% for c in cate.object_list %}
+                                    {% for u in users.object_list %}
                                     <tr>
-                                        <td><input type="checkbox" name="id[]" value="{{ c.id }}" class="minimal"></td>
-                                        <td>{{ c.id }}</td>
+                                        <td><input type="checkbox" name="id[]" value="{{ p.id }}" class="minimal"></td>
+                                        <td>{{ u.id }}</td>
+                                        <td>{{ u.profile }}</td>
+                                        <td>{{ u.username }}</td>
                                         <td>
-                                            <span class="editable" data-pk="{{ c.id }}" data-name="{{ c.category_name }}" data-url="{% url 'category_edit_inline' %}">{{ c.category_name }}</span>
+                                            <span class="editable" data-pk="{{ u.id }}" data-name="{{ u.name }}" data-url="{% url 'user_edit_inline' %}">{{ u.name }}</span>
                                         </td>
                                         <td>
-                                            {{ c.paper_total }}
+                                            {{ u.eamil }}
                                         </td>
-                                        <td>{{ c.data }}</td>
-                                        <td>
-                                            <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="status" 
-                                            data-value="{{ c.status }}" data-url="{% url 'category_edit_inline' %}"
-                                            class='editimg fa {% ifequal c.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
+                                        <td>{{ u.log_total }}</td>
+                                        <td>{{ u.is_admin }}
+                                            <a href="javascript:void(0);" data-id="{{ u.id }}" data-field="admin" 
+                                            data-value="{{ u.is_admin }}" data-url="{% url 'user_edit_inline' %}"
+                                            class='editimg fa {% ifequal u.is_admin 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
+                                        </td>
+                                        <td>{{ u.is_active }}
+                                            <a href="javascript:void(0);" data-id="{{ u.id }}" data-field="active" 
+                                            data-value="{{ u.is_active }}" data-url="{% url 'user_edit_inline' %}"
+                                            class='editimg fa {% ifequal u.is_active 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="secrete" 
-                                            data-value="{{ c.secrete }}" data-url="{% url 'category_edit_inline' %}"
-                                            class='editimg fa {% ifequal c.secrete 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-primary btn-xs" href="{% url 'paper_add' %}?cid={{ c.id }}"><i class="fa fa-save"></i> 新增文章</a>
+                                            <a class="btn btn-primary btn-xs" href="{% url 'user_edit' %}?id={{ u.id }}"><i class="fa fa-edit"></i> 编辑</a> 
 
-                                            <a class="btn btn-primary btn-xs" href="{% url 'category_edit' %}?cid={{ c.id }}"><i class="fa fa-edit"></i> 编辑</a> 
-
-                                            {% ifequal c.status 1 %}
-                                            <a class="btn btn-primary btn-xs" href="{% url 'category_detail' %}?cid={{ c.id }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
-                                            {% else %}
-                                            <button class="btn btn-default btn-xs disabled"><i class="fa fa-edit"></i>查看</button>
-                                            {% endifequal %}
-                                            <a href="javascript:void(0);" data-id="{{ c.id }}"  
-                                            data-url="{% url 'category_del' %}"
+                                            <a href="javascript:void(0);" data-id="{{ u.id }}"  
+                                            data-url="{% url 'user_del' %}"
                                             class="btn btn-xs btn-danger file_del">删除</a>
+
                                         </td>
                                     </tr>
                                     {% endfor %}
                                 </table>
-                                
+
                             </div>
                             <div class="box-footer clearfix">
                                 {% include 'admin/public/paginator.html' %}

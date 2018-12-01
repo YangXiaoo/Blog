@@ -68,7 +68,11 @@
                                         <td>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ p.id }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_edit' %}?pid={{ p.id }}"><i class="fa fa-edit"></i> 编辑</a> 
-                                            <a value="{% url 'paper_del' %}?pid={{ p.id }}" class="btn btn-xs btn-danger file_del">删除</a> 
+
+                                            <a href="javascript:void(0);" data-id="{{ p.id }}"  
+                                            data-url="{% url 'paper_del' %}"
+                                            class="btn btn-xs btn-danger file_del">删除</a>
+
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -87,7 +91,7 @@
         </div>
         {% include 'admin/public/load_foot.html' %}
     </div>
-<script>
+<!-- <script>
     $(document).ready(function(){
         $('.file_del').click(function(){
             var row = $(this).closest('tr');
@@ -122,7 +126,7 @@
         }
     });
 });
-</script>
+</script> -->
     {% include 'admin/public/load_bottom.html' %}
 </body>
 </html>

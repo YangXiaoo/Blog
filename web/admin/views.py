@@ -22,8 +22,9 @@ from api import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from markdown import markdown
-import html2text as ht
+
+WEB_URL = 'http://www.lxa.kim'
+
 
 @defendAttack
 def login(request):
@@ -150,7 +151,7 @@ def category_edit_inline(request):
 
 def category_del(request):
     if request.method == "GET":
-        cid = request.GET.get('cid', '')
+        cid = request.GET.get('id', '')
         c = getObject(Category, id=cid)
         try:
             papers = Paper.objects.filter(cid=cid)
@@ -158,7 +159,7 @@ def category_del(request):
                 p.delete()
             c.delete()
             status = 1
-            info = 'ok'
+            info = 'delete success!'
         except:
             status = 0
             info = 'fail'
@@ -261,7 +262,7 @@ def paper_edit_inline(request):
 
 def paper_del(request):
     if request.method == "GET":
-        pid = request.GET.get('pid', '')
+        pid = request.GET.get('id', '')
         p = getObject(Paper, id=pid)
         try:
             category = getObject(Category, id=p.cid)
@@ -269,7 +270,7 @@ def paper_del(request):
             category.save()
             p.delete()
             status = 1
-            info = 'ok'
+            info = 'delete success!'
         except:
             status = 0
             info = 'fail'
@@ -289,24 +290,23 @@ def admin_markdown_upload_image(request):
     upload_files = request.FILES.getlist('editormd-image-file', None)
     date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
     upload_dir, filename_path = get_tmp_dir()
-    ip = get_client_ip(request)
     try:
         url = ''
         for upload_file in upload_files:
             file_path = '%s/%s' % (upload_dir, upload_file.name)
             file_dir = '%s/%s' % (filename_path, upload_file.name)
             size = upload_file.size
-            up_file = UpFiles(ip=ip,file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
+            up_file = UpFiles(file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
             up_file.save()
             with open(file_path,'w') as f:
                 for chunk in upload_file.chunks():
                     f.write(chunk)
-            url = 'http://www.lxa.kim' + file_path.split(BASE_DIR)[-1]
-        message = 'http://www.lxa.kim/' + str(len(upload_files))
+            url = WEB_URL + file_path.split(BASE_DIR)[-1]
+        message = WEB_URL + str(len(upload_files))
         success = 1
     except Exception as e:
         message = str(e) + str(upload_files)
-        url = 'http://www.lxa.kim/' + 'callback_fail'
+        url = WEB_URL + 'callback_fail'
         success = 0
     return HttpResponse(json.dumps({
                 "success": success,
@@ -315,17 +315,261 @@ def admin_markdown_upload_image(request):
             }))    
 
 
-def user_list(request):
-    pass
+def admin_upload_image(request):
+    upload_files = request.FILES.getlist('imgFile', None)
+    date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    upload_dir, filename_path = get_tmp_dir()
+    try:
+        url = ''
+        for upload_file in upload_files:
+            file_path = '%s/%s' % (upload_dir, upload_file.name)
+            file_dir = '%s/%s' % (filename_path, upload_file.name)
+            size = upload_file.size
+            up_file = UpFiles(typeid=1, file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
+            up_file.save()
+            with open(file_path,'w') as f:
+                for chunk in upload_file.chunks():
+                    f.write(chunk)
+            url = WEB_URL + file_path.split(BASE_DIR)[-1]
+        info = "upload file successful!"
+        success = 1
+    except Exception as e:
+        info = str(e)
+        url = WEB_URL + 'callback_fail'
+        success = 0
+    return HttpResponse(json.dumps({
+                "success": success,
+                "url" : url,
+                "info":info,
+            }))
 
+
+def user_list(request):
+    user_find = Users.objects.all()
+    user_list, p, users, page_range, current_page, show_first, show_end = pages(user_find, request)
+    return render_to_response(reverse('user_list'), locals(), context_instance=RequestContext(request))
+
+
+def user_add(request):
+    if request.method == "POST":
+        username = request.POST.get('username','')
+        password = request.POST.get('password','')
+        repassword = request.POST.get('repassword','')
+        if password != repassword:
+            return HttpResponse(json.dumps({
+            "status": 0,
+            "url" : '',
+            "info":'两次密码不一致',
+            }))
+        name = request.POST.get('name','')
+        email = request.POST.get('email','')
+        gender = request.POST.get('gender','')
+        is_active = request.POST.get('status','')
+        is_admin = request.POST.get('admin','')
+
+        profile = Config.objects.all()[0].defual_img
+        user = Users(username=username, password=password, name=name, email=email,profile=profile, gender=gender, is_active=is_active, is_admin=is_admin)
+        try:
+            user.save()
+            status = 1
+            info = 'successful!'
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+        "status": status,
+        "url" : '',
+        "info":info,
+        }))
+    return render_to_response(reverse('user_add'), locals(), context_instance=RequestContext(request))
+
+
+def user_edit(request):
+    if request.method == "POST":
+        method = request.POST.get('actions','')
+        uid = request.POST.get('id', '') 
+        user = getObject(Users, id=uid)
+        if method == 'baseinfo':        
+            user.email = request.POST.get('email', '')
+            user.gender = request.POST.get('gender')
+        elif method == 'password':
+            user.password = request.POST.get('password', '')
+        elif method == 'avatar':
+            upload_files = request.FILES.getlist('imgFile', None)
+            date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            upload_dir, filename_path = get_tmp_dir()
+            try:
+                url = ''
+                for upload_file in upload_files:
+                    file_path = '%s/%s' % (upload_dir, upload_file.name)
+                    file_dir = '%s/%s' % (filename_path, upload_file.name)
+                    size = upload_file.size
+                    up_file = UpFiles(typeid=1, file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
+                    up_file.save()
+                    with open(file_path,'w') as f:
+                        for chunk in upload_file.chunks():
+                            f.write(chunk)
+                    url = WEB_URL + file_path.split(BASE_DIR)[-1]
+                info = "upload file successful!"
+                success = 1
+            except Exception as e:
+                info = str(e)
+                url = WEB_URL + 'callback_fail'
+                success = 0
+            return HttpResponse(json.dumps({
+                        "success": success,
+                        "url" : url,
+                        "info":info,
+                    }))
+        elif method == 'infos':
+            user.user_info = request.POST.get('info', ''
+                )
+        try:
+            user.save()
+            status = 1
+            info = 'successful!'
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+        "status": status,
+        "url" : '',
+        "info":info,
+        }))
+
+    elif request.method == "GET":
+        uid = request.GET.get('id', '')
+        u = getObject(Users, id=uid)
+        return render_to_response(reverse('user_edit'), locals(), context_instance=RequestContext(request))
+
+
+def user_edit_inline(request):
+    if request.method == "GET":
+        uid = request.GET.get('id', )
+        name = request.GET.get('name', '')
+        active = request.GET.get('active','')
+        admin = request.GET.get('admin','')
+    elif request.method == "POST":
+        uid = request.POST.get('id', )
+        name = request.POST.get('name', '')
+        active = request.POST.get('active','')
+        admin = request.POST.get('admin','')
+    user = getObject(Users, id=uid)
+    try:
+        if name != '':
+            user.name = name
+        elif active != '':
+            user.is_active = active
+        elif admin != '':
+            user.ia_admin = admin
+        user.save()
+        status = 1
+        info = 'successful!'
+    except:
+        status = 0
+        info = 'fail'
+    return HttpResponse(json.dumps({
+                "status": status,
+                "info": info
+            })) 
+
+
+def user_del(request):
+    if request.method == "GET":
+        uid = request.GET.get('id', '')
+        u = getObject(Users, id=uid)
+        try:
+            u.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
 
 
 def paper_comment_list(request):
     pass
 
 
-def web_config(request):
+def blog_message_list(request):
     pass
+
+
+def web_config(request):
+    if request.method == 'POST':
+        id = request.POST.get('id', '') 
+        key = ['title', 'keywords', 'description','copyright', 'web_log', 'address', 'record', 'web_owner']
+        data = {}
+        for k in key:
+            data[k] = request.POST.get(k, '')
+        Config.objects.filter(id=id).update(**data)
+    web = Config.objects.all()
+    return render_to_response(reverse('web_config'), locals(), context_instance=RequestContext(request))
+
+def web_file(request):
+    files = UpFiles.objects.all()
+    if request.method == "GET":
+        keyword = request.GET.get('keyword', '')
+        file_dir = request.GET.get('download', '')
+        if file_dir:
+            file_path = os.path.join(BASE_DIR, 'static/files', file_dir)
+            if os.path.isfile(file_path):
+                f = open(file_path)
+                data = f.read()
+                f.close()
+                response = HttpResponse(data, content_type='application/octet-stream')
+                response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(file_path)
+                return response
+    elif request.method == "POST":
+        file_id = request.POST.get('id', '')
+    if keyword:
+        files = UpFiles.objects.filter(file_name__contains=keyword)
+    files_list, p, files, page_range, current_page, show_first, show_end = pages(files, request)
+    return render_to_response(reverse('web_file'), locals(), context_instance=RequestContext(request))
+
+def file_edit_inline(request):
+    if request.method == "GET":
+        file_id = request.GET.get('id','')
+        file_name = request.GET.get('name','')
+    elif request.method == "POST":
+        file_name = request.POST.get('name', '')
+        file_id = request.POST.get('id','')
+    else:
+        return HttpResponse('Error request')
+    file = getObject(UpFiles, id=file_id)
+    file.file_name = file_name
+    try:
+        file.save()
+        status = 1
+        info = 'ok'
+    except:
+        status = 0
+        info = 'fail'
+    return HttpResponse(json.dumps({
+                "status": status,
+                "info": info
+            })) 
+
+
+def web_file_del(request):
+    if request.method == "GET":
+        fid = request.GET.get('id', '')
+        f = getObject(UpFiles, id=fid)
+        try:
+            f.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
 
 
 def login_log_list(request):

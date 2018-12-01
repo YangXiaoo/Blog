@@ -17,10 +17,11 @@ class Config(models.Model):
     record = models.CharField(max_length = 100, null=True) # 备案
     address = models.CharField(max_length = 100, null=True)
     web_owner = models.CharField(max_length = 100, null=True)
+    default_img = models.CharField(max_length = 100, null=True)
 
 
 class UpFiles(models.Model):
-    ip = models.CharField(max_length=32, blank=True, null=True)
+    typeid = sorts = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1
     file_name = models.CharField(max_length=100, blank=False, null=False)
     date_add = models.DateTimeField(auto_now=True, null=True)
     file_path = models.CharField(max_length=200)
@@ -59,11 +60,11 @@ class Viewlog(models.Model):
     浏览日志
     """
     uid = models.IntegerField(default = 0, null=True)
-    name = models.CharField(max_length=50, null=True)
     ip = models.CharField(max_length=20)
     date = models.DateField(auto_now=True, null=True)
     area = models.CharField(max_length=50)
     pid = models.CharField(max_length=100)
+
 
 
 class Databases(models.Model):
@@ -71,12 +72,12 @@ class Databases(models.Model):
     数据库备份
     """
     file_name = models.CharField(max_length=100, blank=False, null=False)
-    date_add = models.DateTimeField(auto_now=True, null=True)
+    date = models.DateTimeField(auto_now=True, null=True)
     file_path = models.CharField(max_length=100)
-    dirs = models.CharField(max_length=100)
     size = models.CharField(max_length=30, blank=True, null=True)
 
 
+# 太费资源
 class Thumbs(models.Model):
     """
     点赞数
