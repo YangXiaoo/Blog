@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 登录 </title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg container">
+    <div class="middle-box text-center loginscreen animated fadeInDown">
+        <div>
+            <div>
+                <h1 class="center">&nbsp;</h1>
+            </div>
+            {% if error %}
+                <div class="alert alert-danger text-center">{{ error }}</div>
+            {% endif %}
+            <h2>登录</h2>
+            <form class="m-t" role="form" method="post" action="">
+                <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="Username" required="length[6~50]">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required="">
+                </div>
+                <button type="submit" class="btn btn-success block full-width m-b">Login</button>
+            </form>
+        </div>
+    </div>
+    <script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <script src="/static/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>
+

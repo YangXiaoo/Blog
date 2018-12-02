@@ -4,7 +4,6 @@ import uuid
 import urllib
 import time
 import json
-from collections import Iterable
 
 from django.db.models import Count
 from django.shortcuts import render_to_response
@@ -13,59 +12,53 @@ from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.db.models import Q
 
-
 from myweb.api import *
 from myweb.models import *
 from myweb.settings import *
 
 from api import *
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 
+import ConfigParser
 
 WEB_URL = 'http://www.lxa.kim'
 
 
 @defendAttack
 def login(request):
-    '''
-    登录
-    '''
     error = ''
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('admin_index'))
     if request.method == 'GET':
-        return render_to_response('login.html')
+        return render_to_response('/admin/login.html')
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
         if username and password:
-            userinfo = get_object(Users, username=username)
+            userinfo = getObject(Users, username=username)
             if userinfo is not None:
-                if userinfo.is_active == 1:
+                if userinfo.is_active == 1 and userinfo.password == password and userinfo.is_admin == 1:
                     request.session['role_id'] = 0
                     request.session.set_expiry(3600)
-                    return HttpResponseRedirect(reverse('login'))
+                    response = render_to_response(reverse('admin_index'), {})
+                    return response
                 else:
                     error = '用户未激活'
             else:
-                error = '用户或密码错误'
+                error = '用户不存在'
         else:
             error = '用户名或密码未正确输入'
-    return render_to_response('login.html',{'error':error})
+    return render_to_response('/admin/login.html',{'error':error})
 
 
-@login_required(login_url='/login')
-def logout(request):
+
+@require_login
+def log_out(request):
     '''
     注销
     '''
     request.session['role_id'] = ''
-    logout(request)
-
     return HttpResponseRedirect(reverse('login'))
 
 
+@require_login
 def admin_index(request):
     '''
     主页
@@ -347,7 +340,7 @@ def admin_upload_image(request):
 def user_list(request):
     user_find = Users.objects.all()
     user_list, p, users, page_range, current_page, show_first, show_end = pages(user_find, request)
-    return render_to_response(reverse('user_list'), locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/user/user_list.html', locals(), context_instance=RequestContext(request))
 
 
 def user_add(request):
@@ -381,7 +374,7 @@ def user_add(request):
         "url" : '',
         "info":info,
         }))
-    return render_to_response(reverse('user_add'), locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/user/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 def user_edit(request):
@@ -440,7 +433,7 @@ def user_edit(request):
     elif request.method == "GET":
         uid = request.GET.get('id', '')
         u = getObject(Users, id=uid)
-        return render_to_response(reverse('user_edit'), locals(), context_instance=RequestContext(request))
+        return render_to_response('admin/user/user_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def user_edit_inline(request):
@@ -492,7 +485,78 @@ def user_del(request):
 
 
 def paper_comment_list(request):
-    pass
+    find = Comment.objects.all()
+    papers = Paper.objects.all()
+    users = Users.objects.all()
+    for f in find:
+        for p in papers:
+            if f.pid == p.id:
+                f.title = p.title
+        for u in users:
+            if f.uid == u.id:
+                f.user = u.name 
+            if f.ruid = u.id:
+                f.ruser = u.name
+
+    comment_list, p, comments, page_range, current_page, show_first, show_end = pages(find, request)
+    return render_to_response('admin/comment/paper_comment_list.html', locals(), context_instance=RequestContext(request))
+
+
+def comment_edit(request):
+    if request.method == "GET":
+        cid = request.GET.get('id', '')
+        c = Comment.objects.filter(id=cid)
+        paper = Paper.objects.filter(id=c.pid)
+        user = Users.objects.filter(id=c.uid)
+        ruser = Users.objects.filter(id=c.rid)
+        rc = Comment.objects.filter(id=c.pcid)
+        return render_to_response('admin/comment/comment_edit.html', locals(), context_instance=RequestContext(request))
+    elif request.method == "POST":
+        cid = request.POST.get('id', '')
+        c = Comment.objects.filter(id=cid)
+        c.content = request.POST.get('content', '')
+        c.status = request.POST.get('status', '')
+        c.save()
+        HttpResponseRedirect(reverse('comment_list'))
+
+
+def comment_edit_inline(request):
+    if request.method == "GET":
+        cid = request.GET.get('id', )
+        status = request.GET.get('status', '')
+    elif request.method == "POST":
+        cid = request.POST.get('id', )
+        status = request.POST.get('status', '')
+    c = getObject(Comment, id=cid)
+    try:
+        c.status = status
+        c.save()
+        status = 1
+        info = 'successful!'
+    except:
+        status = 0
+        info = 'fail'
+    return HttpResponse(json.dumps({
+                "status": status,
+                "info": info
+            })) 
+
+
+def comment_del(request):
+    if request.method == "GET":
+        cid = request.GET.get('id', '')
+        c = getObject(Users, id=cid)
+        try:
+            c.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
 
 
 def blog_message_list(request):
@@ -508,7 +572,8 @@ def web_config(request):
             data[k] = request.POST.get(k, '')
         Config.objects.filter(id=id).update(**data)
     web = Config.objects.all()
-    return render_to_response(reverse('web_config'), locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/config/web_config.html', locals(), context_instance=RequestContext(request))
+
 
 def web_file(request):
     files = UpFiles.objects.all()
@@ -529,7 +594,8 @@ def web_file(request):
     if keyword:
         files = UpFiles.objects.filter(file_name__contains=keyword)
     files_list, p, files, page_range, current_page, show_first, show_end = pages(files, request)
-    return render_to_response(reverse('web_file'), locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/config/web_file.html', locals(), context_instance=RequestContext(request))
+
 
 def file_edit_inline(request):
     if request.method == "GET":
@@ -573,20 +639,196 @@ def web_file_del(request):
 
 
 def login_log_list(request):
-    pass
+    find = Loginlog.objects.all()
+    log_list, p, logs, page_range, current_page, show_first, show_end = pages(find, request)
+    return render_to_response('admin/webmaster/login_log_list.html', locals(), context_instance=RequestContext(request))
+
+
+def login_del(request):
+    if request.method == "GET":
+        fid = request.GET.get('id', '')
+        f = getObject(Loginlog, id=fid)
+        try:
+            f.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                }))  
 
 
 def view_log_list(request):
-    pass
+    find = Viewlog.objects.all()
+    view_list, p, views, page_range, current_page, show_first, show_end = pages(find, request)
+    return render_to_response('admin/webmaster/view_log_list.html', locals(), context_instance=RequestContext(request))
+
+
+def view_log_del(request):
+    if request.method == "GET":
+        fid = request.GET.get('id', '')
+        f = getObject(Loginlog, id=fid)
+        try:
+            f.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                }))  
 
 
 def blogroll_list(request):
-    pass
+    find = Blogroll.objects.all()
+    roll_list, p, rolls, page_range, current_page, show_first, show_end = pages(find, request)
+    return render_to_response('admin/webmaster/blogroll_list.html', locals(), context_instance=RequestContext(request))
 
+
+def blogroll_add(request):
+    if request.method == "POST":
+        rid = request.POST.get('id','')
+        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_eamil', 'web_description', 'sorts', 'status']
+        data = {}
+        for k in lists:
+            data[k] = request.POST.get(k, '')
+        try:
+            Blogroll.objects.filter(id=rid).update(**data)
+            status = 1
+            info = 'successful!'
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+        "status": status,
+        "url" : '',
+        "info":info,
+        }))
+
+    return render_to_response('admin/webmaster/blogroll_add.html', locals(), context_instance=RequestContext(request))
+
+
+def blogroll_edit(request):
+    if request.method == "POST":
+        rid = request.POST.get('id','')
+        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_eamil', 'web_description', 'sorts', 'status']
+        data = {}
+        for k in lists:
+            data[k] = request.POST.get(k, '')
+        try:
+            Blogroll.objects.filter(id=rid).update(**data)
+            status = 1
+            info = 'successful!'
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+        "status": status,
+        "url" : '',
+        "info":info,
+        }))
+    elif request.method == "GET":
+        rid = request.GET.get('id', '')
+        r = getObject(Blogroll, id=rid)
+        return render_to_response('admin/webmaster/blogroll_edit.html', locals(), context_instance=RequestContext(request))
+
+
+def blogroll_edit_inline(request):
+    if request.method == "GET":
+        rid = request.GET.get('id', )
+        name = request.GET.get('name', '')
+        status = request.GET.get('status','')
+    elif request.method == "POST":
+        rid = request.POST.get('id', )
+        name = request.POST.get('name', '')
+        status = request.POST.get('status','')
+    blog_link = getObject(Blogroll, id=rid)
+    try:
+        if name != '':
+            blog.name = name
+        elif status != '':
+            blog.status = status
+        blog.save()
+        status = 1
+        info = 'successful!'
+    except:
+        status = 0
+        info = 'fail'
+    return HttpResponse(json.dumps({
+                "status": status,
+                "info": info
+            })) 
+
+
+def blogroll_del(request):
+    if request.method == "GET":
+        fid = request.GET.get('id', '')
+        f = getObject(Blogroll, id=fid)
+        try:
+            f.delete()
+            status = 1
+            info = 'delete successful!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                }))  
 
 def database_list(request):
-    pass
+    files = UpFiles.objects.filter(typeid=2)
+    files_list, p, files, page_range, current_page, show_first, show_end = pages(files, request)
+    return render_to_response('admin/database/database_list', locals(), context_instance=RequestContext(request))
 
 
-def database_back_list(request):
-    pass
+def database_backup(request):
+    config = ConfigParser.ConfigParser()
+    config.read(os.path.join(BASE_DIR, 'myweb.conf'))
+    if config.get('db', 'engine') == 'mysql': 
+        file_name = str(datetime.datetime.now().strftime("%Y%m%d%H%M%S")) + '.sql'
+        upload_dir, filename_path = get_tmp_dir()
+        try:
+            
+            file_path = '%s/%s' % (upload_dir, file_name)
+            file_dir = '%s/%s' % (filename_path, file_name)
+            ret = bash('mysqldump   -u %s  -p %s  %s > %s' % (DB_USER,DB_PASSWORD, DB_DATABASE, file_path))
+            if ret != 0:
+                ret = bash('mysqldump  %s > %s' % (DB_DATABASE, file_path))
+            size = bash('du -b %s' % file_path).split(' ')[0]
+            up_file = UpFiles(typeid=2, file_name=file_name,file_path=file_dir, dirs=file_path, size=size)
+            up_file.save()
+        except:
+            pass
+    else:
+        pass
+    database_list(request)
+
+
+def database_recover(request):
+    if request.method == "GET":
+        fid = request.GET.get('id', '')
+        f = getObject(UpFiles, id=fid)
+        try:
+            config = ConfigParser.ConfigParser()
+            config.read(os.path.join(BASE_DIR, 'myweb.conf'))
+            if config.get('db', 'engine') == 'mysql': 
+                ret = bash('mysqldump   -u %s  -p %s  %s < %s' % (DB_USER,DB_PASSWORD, DB_DATABASE, file_path))
+                if ret != 0:
+                    ret = bash('mysql %s < %s' % (DB_DATABASE, f.file_path))
+                status = 1
+                info = 'database recover successful!'
+            else:
+                pass
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 

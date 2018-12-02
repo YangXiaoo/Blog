@@ -100,11 +100,11 @@ def chown(path, user, group=''):
     except KeyError:
         pass
 
-def get_tmp_dir():
+def get_tmp_dir(dirs='static/files'):
     seed = uuid.uuid4().hex[:4]
     now = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     file_path = '%s-%s' % (now, seed)
-    path = os.path.join(BASE_DIR,'static/files')
+    path = os.path.join(BASE_DIR, dirs)
     dir_name = os.path.join(path, file_path)
     mkdir(dir_name, mode=777)
     return dir_name,file_path
@@ -119,3 +119,15 @@ def get_client_ip(request):
         except:
             ip = ""
     return ip
+
+
+def require_login(func):
+    """
+    用户验证
+    """
+    def _deco(request, *args, **kwargs):
+        if request.session.get('role_id') != 0:
+            return HttpResponseRedirect(reverse('login'))
+        else:
+            return func(request, *args, **kwargs)
+    return _deco

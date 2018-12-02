@@ -43,8 +43,15 @@ urlpatterns = patterns('admin.views',
 
     # tool
     url(r'^login_log_list$', 'login_log_list', name='login_log_list'),
+    url(r'^login_del$', 'login_del', name='login_del'),
+
     url(r'^view_log_list$', 'view_log_list', name='view_log_list'),
+    url(r'^view_log_del$', 'view_log_del', name='view_log_del'),
+
     url(r'^blogroll_list$', 'blogroll_list', name='blogroll_list'),
+    url(r'^blogroll_add$', 'blogroll_add', name='blogroll_add'),
+    url(r'^blogroll_edit$', 'blogroll_edit', name='blogroll_edit'),
+    url(r'^blogroll_del$', 'blogroll_del', name='blogroll_del'),
 
 
     # databases

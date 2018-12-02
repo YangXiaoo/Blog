@@ -8,7 +8,7 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-9 blog-main">
+        <div class="col-sm-8 blog-main">
 
             <div class="blog-post">
                 <h4 class="blog-post-title">{{ p.title }}</h4>
@@ -42,10 +42,16 @@
                     </a>
                 </div>
                 <div class="pull-right">
-                    <button class="btn like arc-thumbs-up" type="button" data-id="{{ p.id }}" data-kind="0" title="点赞" data-toggle="tooltip" >
+                    <button class="btn dislike arc-thumbs-down" type="button" data-id="{{ p.id }}" data-kind="0" data-url="{% url 'thumbs' %}" title="差评" data-toggle="tooltip" >
+                        <i class="fa fa-thumbs-o-down"></i>
+                        <span>{{ p.dislike }}</span>
+                    </button>    
+
+                    <button class="btn like arc-thumbs-up" type="button" data-id="{{ p.id }}" data-kind="1" data-url="{% url 'thumbs' %}" title="点赞" data-toggle="tooltip" >
                         <i class="fa fa-thumbs-o-up"></i>
                         <span>{{ p.like }}</span>
-                    </button>                        
+                    </button>  
+
                 </div>
                 <br>
                 <hr>
@@ -55,10 +61,93 @@
                 <hr>
             </div>
           <!-- /.blog-post -->
-            <div class="box-body">      
-                <div align="center" style="position: relative;z-index: 1">请先<a href="#">登录</a>，再发表留言。
+
+
+            <div class="box-body">
+                {% for  c in comments %}
+                <div class="item bs-callout bs-callout-gray">
+                    <img src="{% c.uid|user_profile %}" alt="{% c.uid|user_profile %}" height="20px" width="20pxt" class="offline">                
+                    <span>
+                        <a href="#" target="_blank" class="name">#</a>
+
+                        <small class="text-muted"><i class="fa fa-clock-o"></i> {{ c.date|date:"Y-m-j"}}</small>   
+                    </span>
+                    <br>
+                    <br>
+
+                    {{ c.content }}
+
+                    {% ifnotequal request.COOKIES.get('uid', -1) -1 %}
+                    <button href="javascript:void(0);" data-cid="{{ c.id }}" data-ruid="{{ c.uid }}" class="btn btn-info btn-xs pull-right arc-btn">回复</button>
+                    {% endifnotequal %}
+                    <br>
+                    <br>
+
+                    {% for r in c.id|reply %}
+                    <div class="arc-reply" >
+                    
+                        <blockquote style="background-color: #F8F8FF;">
+                            <img src="{% r.uid|user_profile %}" alt="{% r.uid|user_profile %}" height="20px" width="20px" >
+                            
+                               <span> <a href="#" target="_blank" class="name">{% r.uid|user_name %}</a>
+                               </span>
+
+                                <i class="fa fa-clock-o" style="font-size:85%;">{{ r.date|date:"Y-m-j"}}</i>
+                            
+                            <p>{% r.ruid|reply_user:c.uid %}
+                            {{ r.content }}</p>
+                            
+                            {% ifnotequal request.COOKIES.get('uid', -1) -1 %}
+                            <div align="left">
+                                <button href="javascript:void(0);" data-ruid="{$vo2.uid}" data-cid="{$vo.id}" data-tid="{$vo2.id}" class="btn btn-info btn-xs  arc-btn">回复</button>
+                                </div>
+                            {% endifnotequal %}
+                        </blockquote>
+                    </div>
+                    {% endfor %}
                 </div>
+                {% endfor %}
+
+                {% ifnotequal p.comment_total 0 %}
+                <div class="new-comen-box"></div>
+                <div class="x-mb-15">
+                    <button class="btn btn-block" id="new-comen-btn" data-page="2"
+            data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 加载中..." data-dirs="#" data-id="{{ p.id }}" style="background-color: #B4EEB4;">
+                        加载更多评论
+                    </button>
+                </div>
+                {% endifnotequal %}
             </div>
+
+
+
+            {% ifnotequal request.COOKIES.get('uid', -1) -1 %}
+            <div class="clearfix guestbook_box">
+                <form class="arc-form clearfix" method="POST" action="{% url 'paper_comment' %}" onsubmit="return false" >
+                    <input type="hidden" name="ruid" value="0" />
+                    <input type="hidden" name="cid" value="0" />
+                    <input type="hidden" name="tid" value="0" />
+                    <input type="hidden" name="aid" value="{$archive.id}" />
+                    <input type="hidden" name="uid" value="{$userId}" />
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                        <img class="img-responsive img-circle img-sm" src="{% request.COOKIES.get('profile', '') %}" alt="Alt Text" height="30px" width="30px">
+                            <label for="gb_content">评论内容 <span class="text-red">*</span></label>
+                            <textarea class="form-control" id="gb_content" name="content" rows="3" style="resize:none;" placeholder="说点什么吧..."></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success pull-right submits" data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 提交">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div align="center" style="position: relative;z-index: 1">
+                请先<a href="{:url('Login/login')}">登录</a>，再发表留言。
+            </div>
+            {% endifnotequal %}
 
         </div><!-- /.blog-main -->
 

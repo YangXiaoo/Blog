@@ -18,46 +18,97 @@ from myweb.settings import MAIL_ENABLE
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
-from markdown import markdown
+from admin.models import *
 
 @defendAttack
 def login(request):
-    '''
-    登录
-    '''
-    error = ''
-    if request.user.is_authenticated():
-        return HttpResponseRedirect(reverse('index'))
-    if request.method == 'GET':
-        return render_to_response('login.html')
-    else:
-        username = request.POST.get('username')
+    if request.method == "POST":
+        username = request.POST.get('username', '')
         password = request.POST.get('password')
-        if username and password:
-            userinfo = getObject(Users, username=username)
-            if userinfo is not None:
-                if userinfo.is_active == 1:
-                    request.session['role_id'] = 0
-                    request.session.set_expiry(3600)
-                    return HttpResponseRedirect(reverse('blog/index'))
-                else:
-                    error = '用户未激活'
+        user = getObject(Users, username=username)
+        if user:
+            if user.password == password:
+                request.session['role_id'] = 0
+                request.session['user_id'] = user.id
+                request.session.set_expiry(3600)
+                response= render_to_response('/blog/blog_index.html', {})
+                response.set_cookie('profile',user.profile)
+                response.set_cookie('username',user.username)
+                response.set_cookie('uid', user.id)
+                ip = get_client_ip(request)
+                user.ip = ip 
+                try:
+                    ret = get_area(ip)
+                    if ret[status] == 'success':
+                        login_log = Loginlog(uid=user.id, name=user.username, ip=ip, province=ret[regionName],city=ret[city],area=ret[isp])
+                        login_log.save()
+                except:
+                    pass
+                user.save()
+                return response
             else:
-                error = '用户或密码错误'
+                error = '密码或账号错误'
         else:
-            error = '用户名或密码未正确输入'
-    return render_to_response('blog/login.html',{'error':error})
+            error = '账号不存在'
+        return render_to_response('/admin/login.html',{'error':error})
+    return render_to_response('/admin/login.html')
 
 
-@login_required(login_url='/login')
+
+@require_login
 def logout(request):
     '''
     注销
     '''
+    del request.session['user_id']
     request.session['role_id'] = ''
-    logout(request)
+    return HttpResponseRedirect(reverse('blog_index'))
 
-    return HttpResponseRedirect(reverse('blog/blog_index'))
+
+def sign(request):
+    error = ''
+    if request.method == "POST":
+        password = request.POST.get('password', '')
+        repassword = request.POST.get('repassword', '')
+        if password != repassword:
+            error = "两次密码输入不相同"
+            return render_to_response('/admin/sign.html',{'error':error})
+        username = request.POST.get('username', '')
+        email = request.POST.get('email', '')
+        user = getObject(Users, username=username)
+        if user:
+            error = "用户存在"
+            return render_to_response('/admin/sign.html',{'error':error})
+
+        config = Config.objects.all()[0]
+        ip = get_client_ip(request)
+        user = Users(username=username, password=password, profile=config.default_img, last_ip=ip)
+
+        try:
+            user.save()
+        except Exception as e:
+            error = str(e)
+            return render_to_response('/admin/sign.html',{'error':error})
+
+        try:
+            user = getObject(Users,username=username)
+            ret = get_area(ip)
+            if ret[status] == 'success':
+                login_log = Loginlog(uid=user.id, name=user.username, ip=ip, province=ret[regionName],city=ret[city],area=ret[isp])
+                login_log.save()
+        except:
+            pass
+        user = getObject(Users, username=username)
+        request.session['role_id'] = 0
+        request.session['user_id'] = user.id
+        request.session.set_expiry(3600)
+        response= render_to_response('/blog/blog_index.html', {})
+        response.set_cookie('profile',user.profile)
+        response.set_cookie('username',user.username)
+        response.set_cookie('uid', user.id)
+        return response
+    return render_to_response('/admin/sign.html')
+
 
 
 def blog_index(request):
@@ -84,7 +135,19 @@ def paper_detail(request):
     if request.method == "GET":
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
-    return render_to_response('blog/paper_detail.html', locals(), context_instance=RequestContext(request))
+        p.views += 1
+        p.save()
+        ip = get_client_ip(request)
+        try:
+            uid = request.session.get('user_id','')
+            ret = get_area(ip)
+            if ret.get('status') == 'success':
+                view_log = Viewlog(uid=uid,ip=ip, pid=pid, area=ret.get('isp'))
+                view_log.save()
+        except:
+            pass
+        comments = Comment.objects.filter(Q(pid=pid)&Q(pcid=-1))
+        return render_to_response('blog/paper_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def blog_category_list(request):
@@ -94,4 +157,37 @@ def blog_category_list(request):
 
 
 def blog_search(request):
+    if request.method = "GET":
+        pass
+
+
+def blog_thumbs(request):
+    if request.method == "GET":
+        pid = request.GET.get('id', '')
+        paper = getObject(Paper, id=pid)
+        kind = request.GET.get('kind', '')
+        uid = request.session.get('user_id','')
+        ip = get_client_ip()
+        if kind == 0:
+            thumb = Thumbs(uid=uid, ip=ip, pid=pid, is_dislike=1)
+            paper.dislike += 1
+        else:
+            thumb = Thumbs(uid=uid, ip=ip, pid=pid)
+            paper.like += 1
+        try:
+            thumb.save()
+            paper.save()
+            status = 1
+            info = "谢谢你的支持"
+        except Exception as e:
+            status = 0
+            info = "出问题了...<br>" + str(e)
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
+
+
+
+def paper_comment(request):
     pass

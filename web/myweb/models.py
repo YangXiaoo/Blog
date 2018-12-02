@@ -2,20 +2,14 @@
 # coding: utf-8
 # 2018-11-26
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 import time
 import datetime
 import uuid
 
-class User(AbstractUser):
-    name = models.CharField(max_length = 100)
-    uuid = models.CharField(max_length = 100)
-
-    def __unicode__(self):
-        return self.username
+class Session(models.Model):
+    
 
 class Users(models.Model):
-    id = models.AutoField(primary_key=True)
     username = models.CharField(max_length = 100)
     password = models.CharField(max_length = 100)
     name = models.CharField(max_length = 100, null=True)
@@ -30,6 +24,7 @@ class Users(models.Model):
     data = models.DateField(auto_now_add=True, null=True)
     user_info = models.CharField(max_length = 500, null=True)
     last_login =  models.DateField(auto_now=True, null=True)
+    last_ip = models.CharField(max_length = 20, null=True)
 
     def __unicode__(self):
         return self.username
@@ -75,7 +70,6 @@ class Paper(models.Model):
 
 
 class Comment(models.Model):
-    id = models.AutoField(primary_key=True)
     pid = models.IntegerField(null=False)
     uid = models.IntegerField(default=0, null=True)
     ruid = models.IntegerField(default=0, null=True)
@@ -83,10 +77,5 @@ class Comment(models.Model):
     content = models.CharField(max_length = 1000, null=False)
     data = models.DateField(auto_now=False, auto_now_add=True)
     status = models.IntegerField(default = 1, null=True)
-    like = models.IntegerField(default = 0)
-    dislike = models.IntegerField(default = 0)
-
-
-from django_markdown.models import MarkdownField
-class Test(models.Model):
-    content = MarkdownField()
+    like = models.IntegerField(default = 0, null=True)
+    dislike = models.IntegerField(default = 0, null=True)

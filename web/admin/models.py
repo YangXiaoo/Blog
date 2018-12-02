@@ -21,7 +21,7 @@ class Config(models.Model):
 
 
 class UpFiles(models.Model):
-    typeid = sorts = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1
+    typeid = sorts = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1, sql=2, file=3
     file_name = models.CharField(max_length=100, blank=False, null=False)
     date_add = models.DateTimeField(auto_now=True, null=True)
     file_path = models.CharField(max_length=200)
@@ -37,8 +37,11 @@ class Blogroll(models.Model):
     友情链接
     # 2018-11-30
     """
-    web_name = models.CharField(max_length=200)
+    web_name = models.CharField(max_length=50)
     web_link = models.CharField(max_length=200)
+    web_logo = models.CharField(max_length=200, null=True)
+    web_owner_email = models.CharField(max_length=100, null=True)
+    web_description = models.CharField(max_length=200, null=True)
     status = models.IntegerField(default = 1, null=True)
     sorts = models.IntegerField(default = 0, null=True)
 
@@ -51,18 +54,21 @@ class Loginlog(models.Model):
     uid = models.IntegerField(default = 0, null=True)
     name = models.CharField(max_length=50, null=True)
     ip = models.CharField(max_length=20)
+    province = models.CharField(max_length=50, null=True)
+    city = models.CharField(max_length=50, null=True)
+    county = models.CharField(max_length=50, null=True)
+    area = models.CharField(max_length=50, null=True)
     date = models.DateField(auto_now=True)
-    area = models.CharField(max_length=50)
 
 
 class Viewlog(models.Model):
     """
     浏览日志
     """
-    uid = models.IntegerField(default = 0, null=True)
+    uid = models.IntegerField(default = -1, null=True)
     ip = models.CharField(max_length=20)
     date = models.DateField(auto_now=True, null=True)
-    area = models.CharField(max_length=50)
+    area = models.CharField(max_length=50, null=True)
     pid = models.CharField(max_length=100)
 
 

@@ -5,6 +5,7 @@
 import os, sys, time
 import subprocess
 import uuid
+import urllib2
 import django
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
@@ -19,7 +20,7 @@ from email.utils import formataddr
 from smtplib import SMTP, SMTP_SSL, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
 
 from myweb.models import Users
-from myweb.settings import MAIL_ENABLE
+from myweb.settings import *
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myweb.settings'
 
@@ -30,6 +31,7 @@ def bash(cmd):
     执行bash命令
     '''
     return subprocess.call(cmd, shell=True)
+
 
 def getMacAddress():
     '''
@@ -149,3 +151,23 @@ def pages(post_objects, request):
 
     # 所有对象， 分页器， 本页对象， 所有页码， 本页页码，是否显示第一页，是否显示最后一页
     return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
+
+
+def get_client_ip(request):
+    try:
+        real_ip = request.META['HTTP_X_FORWARDED_FOR']
+        ip = real_ip.split(",")[0]
+    except:
+        try:
+            ip = request.META['REMOTE_ADDR']
+        except:
+            ip = ""
+    return ip
+
+
+def get_area(ip):
+    url = 'http://ip-api.com/json/' + str(ip)
+    urlobject = urllib2.urlopen(url)  
+    urlcontent = urlobject.read()  
+    res = json.loads(urlcontent)
+    return res

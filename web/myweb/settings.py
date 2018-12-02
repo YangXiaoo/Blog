@@ -71,8 +71,8 @@ ALLOWED_HOSTS = ['0.0.0.0/8']
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.sessions',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_crontab',
@@ -140,6 +140,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
+    "django.core.context_processors.request",
     'django.contrib.messages.context_processors.messages',
 )
 TEMPLATE_DIRS = (
