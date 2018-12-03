@@ -64,7 +64,7 @@
                 <input class="form-control" name="litpic" value="{{ p.litpic }}" placeholder="{{ p.litpic }}" >
                 <span class="input-group-btn">
                     <a href="{{ p.litpic }}" target="_blank" >
-                        <img src="{{ p.litpic|get_weblog }}" style="height:34px; width:68px;" />
+                        <img src="{{ p.litpic|get_weblogo }}" style="height:34px; width:68px;" />
                     </a>
                     <button class="btn btn-success btn-flat up-btn" type="button" data-url="{% url 'admin_upload_image' %}">
                         <i class="fa fa-cloud-upload"> 上传 </i>

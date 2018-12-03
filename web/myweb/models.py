@@ -1,13 +1,19 @@
 #!/usr/bin/python
-# coding: utf-8
+# coding:UTF-8
 # 2018-11-26
 from django.db import models
 import time
 import datetime
-import uuid
+import uuid    
+from django.contrib.auth.models import AbstractUser
 
-class Session(models.Model):
-    
+class User(AbstractUser):
+    name = models.CharField(max_length = 100)
+    uuid = models.CharField(max_length = 100)
+    # ssh_passwd = models.CharField(max_length = 100)
+
+    def __unicode__(self):
+        return self.username
 
 class Users(models.Model):
     username = models.CharField(max_length = 100)
@@ -75,7 +81,7 @@ class Comment(models.Model):
     ruid = models.IntegerField(default=0, null=True)
     pcid = models.IntegerField(default = -1, null=True) # 默认无父元素
     content = models.CharField(max_length = 1000, null=False)
-    data = models.DateField(auto_now=False, auto_now_add=True)
+    data = models.DateField(auto_now=True, auto_now_add=True)
     status = models.IntegerField(default = 1, null=True)
     like = models.IntegerField(default = 0, null=True)
     dislike = models.IntegerField(default = 0, null=True)

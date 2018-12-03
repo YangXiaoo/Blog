@@ -18,14 +18,15 @@ class Config(models.Model):
     address = models.CharField(max_length = 100, null=True)
     web_owner = models.CharField(max_length = 100, null=True)
     default_img = models.CharField(max_length = 100, null=True)
+    create_data = models.DateTimeField(auto_now=True, null=True)
 
 
 class UpFiles(models.Model):
-    typeid = sorts = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1, sql=2, file=3
+    typeid  = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1, sql=2, file=3
     file_name = models.CharField(max_length=100, blank=False, null=False)
     date_add = models.DateTimeField(auto_now=True, null=True)
     file_path = models.CharField(max_length=200)
-    dirs = models.CharField(max_length=500)
+    dirs = models.CharField(max_length=100)
     size = models.CharField(max_length=30, blank=True, null=True)
 
     def __unicode__(self):
@@ -44,6 +45,7 @@ class Blogroll(models.Model):
     web_description = models.CharField(max_length=200, null=True)
     status = models.IntegerField(default = 1, null=True)
     sorts = models.IntegerField(default = 0, null=True)
+    create_data = models.DateTimeField(auto_now=True, null=True)
 
 
 
@@ -58,7 +60,10 @@ class Loginlog(models.Model):
     city = models.CharField(max_length=50, null=True)
     county = models.CharField(max_length=50, null=True)
     area = models.CharField(max_length=50, null=True)
+    isp = models.CharField(max_length=50, null=True)
     date = models.DateField(auto_now=True)
+    lon = models.CharField(max_length=10, null=True)
+    lat = models.CharField(max_length=10, null=True)
 
 
 class Viewlog(models.Model):
@@ -70,7 +75,9 @@ class Viewlog(models.Model):
     date = models.DateField(auto_now=True, null=True)
     area = models.CharField(max_length=50, null=True)
     pid = models.CharField(max_length=100)
-
+    isp = models.CharField(max_length=50, null=True)
+    lon = models.CharField(max_length=10, null=True)
+    lat = models.CharField(max_length=10, null=True)
 
 
 class Databases(models.Model):
@@ -78,7 +85,7 @@ class Databases(models.Model):
     数据库备份
     """
     file_name = models.CharField(max_length=100, blank=False, null=False)
-    date = models.DateTimeField(auto_now=True, null=True)
+    date = models.DateTimeField(auto_now=True,null=True)
     file_path = models.CharField(max_length=100)
     size = models.CharField(max_length=30, blank=True, null=True)
 

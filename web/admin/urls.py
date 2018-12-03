@@ -3,6 +3,8 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('admin.views',
     url(r'^$', 'admin_index', name='admin_index'),
+    url(r'^admin_login$', 'admin_login', name='admin_login'),
+    url(r'^admin_logout$', 'admin_logout', name='admin_logout'),
 
     # paper category management
     url(r'^category_add$', 'category_add', name='category_add'),
@@ -29,8 +31,12 @@ urlpatterns = patterns('admin.views',
     url(r'^user_del$', 'user_del', name='user_del'),
 
 
-    # message management
+    # message management 
     url(r'^paper_comment_list$', 'paper_comment_list', name='paper_comment_list'),
+    url(r'^comment_edit$', 'comment_edit', name='comment_edit'),
+    url(r'^comment_edit_inline$', 'comment_edit_inline', name='comment_edit_inline'),
+    url(r'^comment_del$', 'comment_del', name='comment_del'),
+
     url(r'^blog_message_list$', 'blog_message_list', name='blog_message_list'),
 
 
@@ -51,12 +57,14 @@ urlpatterns = patterns('admin.views',
     url(r'^blogroll_list$', 'blogroll_list', name='blogroll_list'),
     url(r'^blogroll_add$', 'blogroll_add', name='blogroll_add'),
     url(r'^blogroll_edit$', 'blogroll_edit', name='blogroll_edit'),
+    url(r'^blogroll_edit_inline$', 'blogroll_edit_inline', name='blogroll_edit_inline'),
     url(r'^blogroll_del$', 'blogroll_del', name='blogroll_del'),
 
 
     # databases
     url(r'^database_list$', 'database_list', name='database_list'),
-    url(r'^database_back_list$', 'database_back_list', name='database_back_list'),
+    url(r'^database_backup$', 'database_backup', name='database_backup'),
+    url(r'^database_recover$', 'database_recover', name='database_recover'),
 
 
     # other tool

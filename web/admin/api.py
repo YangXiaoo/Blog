@@ -126,8 +126,20 @@ def require_login(func):
     用户验证
     """
     def _deco(request, *args, **kwargs):
-        if request.session.get('role_id') != 0:
+        if request.session.get('role_id', '') != 0:
             return HttpResponseRedirect(reverse('login'))
+        else:
+            return func(request, *args, **kwargs)
+    return _deco
+
+
+def admin_require_login(func):
+    """
+    用户验证
+    """
+    def _deco(request, *args, **kwargs):
+        if request.session.get('role_id', '') != 0:
+            return render_to_response(reverse('admin_login'))
         else:
             return func(request, *args, **kwargs)
     return _deco

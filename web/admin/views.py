@@ -1,4 +1,4 @@
-# coding: utf-8
+# coding:UTF-8
 from __future__ import division 
 import uuid 
 import urllib
@@ -24,10 +24,10 @@ WEB_URL = 'http://www.lxa.kim'
 
 
 @defendAttack
-def login(request):
+def admin_login(request):
     error = ''
     if request.method == 'GET':
-        return render_to_response('/admin/login.html')
+        return render_to_response('admin/login.html')
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -45,20 +45,20 @@ def login(request):
                 error = '用户不存在'
         else:
             error = '用户名或密码未正确输入'
-    return render_to_response('/admin/login.html',{'error':error})
+    return render_to_response('admin/login.html',{'error':error})
 
 
 
-@require_login
-def log_out(request):
+@admin_require_login
+def admin_logout(request):
     '''
     注销
     '''
     request.session['role_id'] = ''
-    return HttpResponseRedirect(reverse('login'))
+    return HttpResponseRedirect(reverse('admin_login'))
 
 
-@require_login
+@admin_require_login
 def admin_index(request):
     '''
     主页
@@ -360,7 +360,11 @@ def user_add(request):
         is_active = request.POST.get('status','')
         is_admin = request.POST.get('admin','')
 
-        profile = Config.objects.all()[0].defual_img
+        config = Config.objects.all()
+        if config:
+            profile = config[0].default_img
+        else:
+            profile = ''
         user = Users(username=username, password=password, name=name, email=email,profile=profile, gender=gender, is_active=is_active, is_admin=is_admin)
         try:
             user.save()
@@ -454,7 +458,7 @@ def user_edit_inline(request):
         elif active != '':
             user.is_active = active
         elif admin != '':
-            user.ia_admin = admin
+            user.is_admin = admin
         user.save()
         status = 1
         info = 'successful!'
@@ -494,9 +498,9 @@ def paper_comment_list(request):
                 f.title = p.title
         for u in users:
             if f.uid == u.id:
-                f.user = u.name 
-            if f.ruid = u.id:
-                f.ruser = u.name
+                f.user = u.username 
+            if f.ruid == u.id:
+                f.ruser = u.username
 
     comment_list, p, comments, page_range, current_page, show_first, show_end = pages(find, request)
     return render_to_response('admin/comment/paper_comment_list.html', locals(), context_instance=RequestContext(request))
@@ -505,19 +509,19 @@ def paper_comment_list(request):
 def comment_edit(request):
     if request.method == "GET":
         cid = request.GET.get('id', '')
-        c = Comment.objects.filter(id=cid)
-        paper = Paper.objects.filter(id=c.pid)
-        user = Users.objects.filter(id=c.uid)
-        ruser = Users.objects.filter(id=c.rid)
-        rc = Comment.objects.filter(id=c.pcid)
+        c = getObject(Comment, id=cid)
+        paper = getObject(Paper, id=c.pid)
+        user = getObject(Users, id=c.uid)
+        ruser = getObject(Users, id=c.ruid)
+        rc = getObject(Comment, id=c.pcid)
         return render_to_response('admin/comment/comment_edit.html', locals(), context_instance=RequestContext(request))
     elif request.method == "POST":
         cid = request.POST.get('id', '')
-        c = Comment.objects.filter(id=cid)
+        c = getObject(Comment, id=cid)
         c.content = request.POST.get('content', '')
         c.status = request.POST.get('status', '')
         c.save()
-        HttpResponseRedirect(reverse('comment_list'))
+        return HttpResponseRedirect(reverse('paper_comment_list'))
 
 
 def comment_edit_inline(request):
@@ -545,7 +549,7 @@ def comment_edit_inline(request):
 def comment_del(request):
     if request.method == "GET":
         cid = request.GET.get('id', '')
-        c = getObject(Users, id=cid)
+        c = getObject(Comment, id=cid)
         try:
             c.delete()
             status = 1
@@ -566,12 +570,33 @@ def blog_message_list(request):
 def web_config(request):
     if request.method == 'POST':
         id = request.POST.get('id', '') 
-        key = ['title', 'keywords', 'description','copyright', 'web_log', 'address', 'record', 'web_owner']
+        key = ['title', 'keywords', 'description','copyright', 'web_logo', 'address', 'record', 'web_owner', 'default_img']
         data = {}
         for k in key:
             data[k] = request.POST.get(k, '')
-        Config.objects.filter(id=id).update(**data)
+        try:
+            if id == '':
+                config = Config(**data)
+                config.save()
+            else:
+                Config.objects.filter(id=id).update(**data)
+            user = Users.objects.all()
+            for u in user:
+                if not u.profile:
+                    u.profile = data['default_img']
+                    u.save()
+            status = 1
+            info = 'successful!'
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
     web = Config.objects.all()
+    if web:
+        web = web[0]
     return render_to_response('admin/config/web_config.html', locals(), context_instance=RequestContext(request))
 
 
@@ -663,6 +688,11 @@ def login_del(request):
 
 def view_log_list(request):
     find = Viewlog.objects.all()
+    papers = Paper.objects.all()
+    for f in find:
+        for p in papers:
+            if f.pid == p.id:
+                f.paper = p.title
     view_list, p, views, page_range, current_page, show_first, show_end = pages(find, request)
     return render_to_response('admin/webmaster/view_log_list.html', locals(), context_instance=RequestContext(request))
 
@@ -670,7 +700,7 @@ def view_log_list(request):
 def view_log_del(request):
     if request.method == "GET":
         fid = request.GET.get('id', '')
-        f = getObject(Loginlog, id=fid)
+        f = getObject(Viewlog, id=fid)
         try:
             f.delete()
             status = 1
@@ -692,13 +722,13 @@ def blogroll_list(request):
 
 def blogroll_add(request):
     if request.method == "POST":
-        rid = request.POST.get('id','')
-        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_eamil', 'web_description', 'sorts', 'status']
+        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_email', 'web_description', 'sorts', 'status']
         data = {}
         for k in lists:
             data[k] = request.POST.get(k, '')
         try:
-            Blogroll.objects.filter(id=rid).update(**data)
+            r = Blogroll(**data)
+            r.save()
             status = 1
             info = 'successful!'
         except Exception as e:
@@ -716,7 +746,7 @@ def blogroll_add(request):
 def blogroll_edit(request):
     if request.method == "POST":
         rid = request.POST.get('id','')
-        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_eamil', 'web_description', 'sorts', 'status']
+        lists = ['web_name', 'web_link', 'web_logo', 'web_owner_email', 'web_description', 'sorts', 'status']
         data = {}
         for k in lists:
             data[k] = request.POST.get(k, '')
@@ -747,7 +777,7 @@ def blogroll_edit_inline(request):
         rid = request.POST.get('id', )
         name = request.POST.get('name', '')
         status = request.POST.get('status','')
-    blog_link = getObject(Blogroll, id=rid)
+    blog = getObject(Blogroll, id=rid)
     try:
         if name != '':
             blog.name = name
@@ -784,7 +814,7 @@ def blogroll_del(request):
 def database_list(request):
     files = UpFiles.objects.filter(typeid=2)
     files_list, p, files, page_range, current_page, show_first, show_end = pages(files, request)
-    return render_to_response('admin/database/database_list', locals(), context_instance=RequestContext(request))
+    return render_to_response('admin/database/database_list.html', locals(), context_instance=RequestContext(request))
 
 
 def database_backup(request):
@@ -794,7 +824,6 @@ def database_backup(request):
         file_name = str(datetime.datetime.now().strftime("%Y%m%d%H%M%S")) + '.sql'
         upload_dir, filename_path = get_tmp_dir()
         try:
-            
             file_path = '%s/%s' % (upload_dir, file_name)
             file_dir = '%s/%s' % (filename_path, file_name)
             ret = bash('mysqldump   -u %s  -p %s  %s > %s' % (DB_USER,DB_PASSWORD, DB_DATABASE, file_path))
@@ -807,7 +836,7 @@ def database_backup(request):
             pass
     else:
         pass
-    database_list(request)
+    return HttpResponseRedirect(reverse('database_list'))
 
 
 def database_recover(request):

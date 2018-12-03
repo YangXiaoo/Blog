@@ -48,8 +48,8 @@
                                     <tr>
                                         <td><input type="checkbox" name="id[]" value="{{ c.id }}" class="minimal"></td>
                                         <td>{{ c.id }}</td>
-                                        <td>{{ c.title }}
-                                            <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ c.pid }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
+                                        <td>
+                                            <a  href="{% url 'paper_detail' %}?pid={{ c.pid }}" target="_blank">{{ c.title }}</a>
                                         </td>
                                         <td>
                                             {{ c.user }}

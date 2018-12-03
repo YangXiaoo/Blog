@@ -11,7 +11,7 @@ def get_area(ip):
 
 if __name__ == '__main__':
 	# ret = get_area('110.84.0.129')
-	url = 'http://ip-api.com/json/110.84.0.129'
+	url = 'http://ip-api.com/json/223.74.31.79'
 	# 访问url地址, urlobject是<type 'instance'>对象；
 	urlobject = urllib2.urlopen(url)
 

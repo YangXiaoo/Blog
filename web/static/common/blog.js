@@ -116,7 +116,7 @@ $(function(){
         _this.attr('disabled',"true");
         $.ajax({
             type : "get",
-            url : url_path
+            url : url_path,
             dataType : 'json',
             data : dataStr,
             success : function(data) {
@@ -131,5 +131,22 @@ $(function(){
         });
     });
 
-
+    $('body').off('click', '.arc-btn');
+    $('body').on("click", '.arc-btn', function(event){
+        var _this = $(this);
+        var _form = $('.arc-form');
+        if(_this.hasClass('arc-reply')){   //取消回复
+            _this.html('回复').removeClass('btn-danger arc-reply');
+            $('.guestbook_box').append(_form);
+            _form.find('input[name="ruid"]').val(0);
+            _form.find('input[name="pcid"]').val(-1);
+        }else{   //回复
+            $('.arc-btn').html('回复').removeClass('btn-danger arc-reply');   //其他按钮还原
+            _this.html('取消回复').addClass('btn-danger arc-reply');
+            var _item = _this.closest('.item');
+            _this.after(_form);
+            _form.find('input[name="ruid"]').val(_this.data('ruid'));
+            _form.find('input[name="pcid"]').val(_this.data('pcid'));           
+        }
+    });
 });

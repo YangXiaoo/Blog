@@ -1,4 +1,4 @@
-
+{% load common_func %}
 {% include 'admin/public/load_top.html' %}
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -48,9 +48,9 @@
                                         <td><input type="checkbox" name="id[]" value="{{ v.id }}" class="minimal"></td>
                                         <td>{{ v.id }}</td>
                                         <td>{{ v.ip }}</td>
-                                        <td>{{ v.user }}</td>
-                                        <td>   {{ v.paper }}
-                                            <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ v.pid }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
+                                        <td>{{ v.uid|user_info:'username' }}</td>
+                                        <td>   
+                                            <a href="{% url 'paper_detail' %}?pid={{ v.pid }}" target="_blank">{{ v.pid|paper:'title' }}</a>
                                         </td>
                                         <td>{{ v.data }}</td>
                                         <td>

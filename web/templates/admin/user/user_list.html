@@ -50,7 +50,7 @@
                                     <tr>
                                         <td><input type="checkbox" name="id[]" value="{{ p.id }}" class="minimal"></td>
                                         <td>{{ u.id }}</td>
-                                        <td>{{ u.profile }}</td>
+                                        <td><img src="{{ u.profile }}" style="height:30px; width:30px;" /></td>
                                         <td>{{ u.username }}</td>
                                         <td>
                                             <span class="editable" data-pk="{{ u.id }}" data-name="{{ u.name }}" data-url="{% url 'user_edit_inline' %}">{{ u.name }}</span>
@@ -59,12 +59,12 @@
                                             {{ u.eamil }}
                                         </td>
                                         <td>{{ u.log_total }}</td>
-                                        <td>{{ u.is_admin }}
+                                        <td>
                                             <a href="javascript:void(0);" data-id="{{ u.id }}" data-field="admin" 
                                             data-value="{{ u.is_admin }}" data-url="{% url 'user_edit_inline' %}"
                                             class='editimg fa {% ifequal u.is_admin 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
                                         </td>
-                                        <td>{{ u.is_active }}
+                                        <td>
                                             <a href="javascript:void(0);" data-id="{{ u.id }}" data-field="active" 
                                             data-value="{{ u.is_active }}" data-url="{% url 'user_edit_inline' %}"
                                             class='editimg fa {% ifequal u.is_active 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>

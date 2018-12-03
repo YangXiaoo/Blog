@@ -1,3 +1,4 @@
+{% load common_func %}
 <nav class="navbar navbar-default navbar-fixed-top" id="nav-head">
     <div class="container container-fluid">
         <div class="navbar-header">
@@ -7,7 +8,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{:url('Index/index')}" style="padding: 10px 10px 10px 10px"><img src="/PIC/53.png" width="30px" height="30px"></a>
+            <a class="navbar-brand" href="{% url 'blog_index' %}" style="padding: 10px 10px 10px 10px"><img src="{{ 'web_logo'|get_config }}" width="30px" height="30px"></a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" >
             <ul class="nav navbar-nav ">
@@ -31,7 +32,7 @@
                     </div>
                 </form>
 
-            {% ifequal request.COOKIES.get('uid', -1) -1 %}
+            {% if  request.COOKIES.uid == None  %}
             <li>
                 <a href="{% url 'login' %}"><i class="fa fa-user-o"></i></a>
             </li>
@@ -42,7 +43,7 @@
                     <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li align="center">你好, &nbsp;<span>{{ request.COOKIES.get('username') }}</span>
+                    <li align="center">你好, &nbsp;<span>{{ request.COOKIES.username }}</span>
                     </li>
                     <li align="center">
                         <a href="#">信息中心</a>
@@ -52,7 +53,7 @@
                     </li>
                 </ul>
             </li>
-            {% endifequal %}
+            {% endif %}
           </ul>
         </div>
     </div>

@@ -1,4 +1,4 @@
-
+{% load common_func %}
 {% include 'admin/public/load_top.html' %}
 
 <body class="hold-transition skin-blue sidebar-mini">
@@ -42,7 +42,7 @@
                                         <th>省</th>
                                         <th>城市</th>
                                         <th>县/区</th>
-                                        <th>街道</th>
+                                        <th>网络</th>
                                         <th>创建时间</th>
                                         <th>操作</th>
                                     </tr>
@@ -51,7 +51,7 @@
                                         <td><input type="checkbox" name="id[]" value="{{ l.id }}" class="minimal"></td>
                                         <td>{{ l.id }}</td>
                                         <td>{{ l.ip }}</td>
-                                        <td>{{ l.user }}</td>
+                                        <td>{{ l.name }}</td>
                                         <td>{{ l.province }}</td>
                                         <td>{{ l.city }}</td>
                                         <td>{{ l.county }}</td>

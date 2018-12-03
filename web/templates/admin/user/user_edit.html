@@ -45,8 +45,8 @@
                                             <label class="col-sm-2 control-label">性别</label>
                                             <div class="col-sm-7">
                                                 <select class="form-control select2" name="gender" style="width:100%;">
-                                                    <option value="1" {% ifequal u.gender 1 %} selected="selected">男</option>
-                                                    <option value="0" {% ifequal u.gender 0 %} selected="selected" >女</option>
+                                                    <option value="1" {% ifequal u.gender 1 %} selected="selected" {% endifequal %}>男</option>
+                                                    <option value="0" {% ifequal u.gender 0 %} selected="selected" {% endifequal %}>女</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -107,8 +107,8 @@
                                             <label class="col-sm-2 control-label">头像</label>
                                             <div class="col-sm-7">
                                                 <div class="input-group">
-                                                    <input class="form-control" name="avatar" value="{$data.userInfo.avatar}" placeholder="{$Think.lang.avatar}" >
-                                                    <span class="input-group-btn"><button class="btn btn-success btn-flat up-btn" type="button" data-url="{:url('Uploads/avatar')}?dir=avatar"><i class="fa fa-cloud-upload"> 上传</i></button></span>
+                                                    <input class="form-control" name="avatar" value="{{ u.profile }}" placeholder="{{ u.profile }}" >
+                                                    <span class="input-group-btn"><button class="btn btn-success btn-flat up-btn" type="button" data-url="{% url 'admin_upload_image' %}"><i class="fa fa-cloud-upload"> 上传</i></button></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -125,7 +125,7 @@
                                         </div>
                                     </form>
                                     
-                                    <div class="form-horizontal">
+<!--                                     <div class="form-horizontal">
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">头像</label>
                                             <div class="col-sm-7">
@@ -186,7 +186,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <div class="tab-pane" id="tab4">

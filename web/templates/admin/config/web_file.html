@@ -29,27 +29,28 @@
                             <div class="box-header with-border">
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
-                                    <a class="btn btn-primary btn-sm" href="{% url 'file_upload' %}"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-primary btn-sm" href="#"> <i class="fa fa-save"></i> 新增</a> 
                                 </div>
-                            </div>
-                            <div class="box-tools" style="top:10px;">
-                                <form action="" method="GET" pjax-search="">
-                                    <div class="input-group input-group-sm" style="width:250px;">
-                                        <div class="input-group-btn">
-                                            <button type="button" class="btn btn-default dropdown-toggle search-drop-btn" data-toggle="dropdown" aria-expanded="false">
-                                                <span>搜索</span>
-                                                <i class="fa fa-caret-down"></i>
-                                            </button>
-                                            <input type="hidden" class="search_field" name="search_field" value="title" />
+                            
+                                <div class=" pull-right" style="top:10px;">
+                                    <form action="" method="GET" pjax-search="">
+                                        <div class="input-group input-group-sm" style="width:250px;">
+                                            <div class="input-group-btn">
+                                                <button type="button" class="btn btn-default dropdown-toggle search-drop-btn" data-toggle="dropdown" aria-expanded="false">
+                                                    <span>搜索</span>
+                                                    <i class="fa fa-caret-down"></i>
+                                                </button>
+                                                <input type="hidden" class="search_field" name="search_field" value="title" />
 
+                                            </div>
+                                            <input type="text" name="keyword" class="form-control pull-right" value="" placeholder="搜索" />
+                                            <div class="input-group-btn">
+                                                <button type="submit" class="btn btn-default sreachs"><i class="fa fa-search"></i>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <input type="text" name="keyword" class="form-control pull-right" value="" placeholder="搜索" />
-                                        <div class="input-group-btn">
-                                            <button type="submit" class="btn btn-default sreachs"><i class="fa fa-search"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
 
                             <div class="box-body table-responsive">
@@ -68,16 +69,13 @@
                                         <td><input type="checkbox" name="id[]" value="{{ f.id }}" class="minimal"></td>
                                         <td>{{ f.id }}</td>
                                         <td><span class="editable" data-pk="{{ f.id  }}" data-name="{{ f.file_name  }}" data-url="{% url 'file_edit_inline' %}" >{{ f.file_name }}</span></td>
-                                        <td>{{ f.file_name }}</td>
                                         <td>
                                             {{ f.size|filesizeformat }}
                                         </td>
                                         <td>
                                             <a href="{% url 'web_file' %}?download={{ f.file_path }}" target="_blank" class="alert-link">下载</a>
                                         </td>
-                                        <td>{{ u.log_total }}</td>
-                                        <td>{{ files.date_add }}
-                                        </td>
+                                        <td>{{ f.date_add }}</td>
                                         <td>
                                             <a href="javascript:void(0);" data-id="{{ f.id }}"  
                                             data-url="{% url 'web_file_del' %}"
