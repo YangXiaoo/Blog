@@ -1,24 +1,25 @@
-# coding: utf-8
-from __future__ import division 
+# coding:UTF-8
 import uuid 
 import urllib
-from collections import Iterable
-
-from django.db.models import Count
+import time
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseNotFound
 from django.http import HttpResponse
 from django.db.models import Q
 
 from myweb.api import *
 from myweb.models import *
-# from myweb.forms import *
-from myweb.settings import MAIL_ENABLE
+from myweb.settings import *
 
 
 from admin.models import *
-from admin.api import require_login
+from admin.api import require_login,send_mail
+
+from email.mime.text import MIMEText
+from email.header import Header
+
+WEB_URL = 'http://www.lxa.kim'
+WEB_TITLE = '杨潇-博客'
 
 @defendAttack
 def login(request):
@@ -36,7 +37,8 @@ def login(request):
                 response.set_cookie('username',user.username)
                 response.set_cookie('uid', user.id)
                 ip = get_client_ip(request)
-                user.ip = ip 
+                user.last_ip = ip 
+                user.log_total += 1
                 try:
                     ret = get_area(ip)
                     if ret.get('status') == 'success':
@@ -91,7 +93,7 @@ def sign(request):
         else:
             default_img = ''
         ip = get_client_ip(request)
-        user = Users(username=username, password=password, profile=default_img, last_ip=ip)
+        user = Users(username=username, password=password, profile=default_img, last_ip=ip, log_total=1)
 
         try:
             user.save()
@@ -124,7 +126,10 @@ def blog_index(request):
     '''
     主页
     '''
-    category = Category.objects.filter(status=1)
+    if request.session.get('role_id', '') == 0:
+        category = Category.objects.filter(status=1)
+    else:
+        category = Category.objects.filter(Q(status=1)&Q(secrete=0))
     cid = []
     for c in category:
         cid.append(c.id)
@@ -135,8 +140,19 @@ def blog_index(request):
 def category_detail(request):
     if request.method == "GET":
         cid = request.GET.get('cid', '')
-        category_name = getObject(Category, id=cid).category_name
-        papers = Paper.objects.filter(cid=cid)
+        cate = getObject(Category, id=cid)
+        if cate.status == 0:
+            error = '404, 该资源无法查看'
+            return render_to_response('blog/404.html',{'error':error})
+        if cate.secrete == 1:
+            if request.session.get('role_id', '') != 0:
+                error = '该内容需要登录才能查看'
+                return render_to_response('blog/login.html',{'error':error}) 
+        category_name = cate.category_name
+        if request.session.get('role_id', '') != 0:
+            papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0))
+        else:
+            papers = Paper.objects.filter(Q(cid=cid)&Q(status=1))
     return render_to_response('blog/category_detail.html', locals(), context_instance=RequestContext(request))
 
 
@@ -144,15 +160,21 @@ def paper_detail(request):
     if request.method == "GET":
         pid = request.GET.get('pid', '')
         p = getObject(Paper, id=pid)
+        if p.status == 0:
+            error = '404, 该资源无法查看'
+            return render_to_response('blog/404.html',{'error':error})
+        if p.secrete == 1:
+            error = '该内容需要登录才能查看'
+            return render_to_response('blog/login.html',{'error':error})
         p.views += 1
         p.save()
         ip = get_client_ip(request)
         try:
-            uid = request.COOKIES.get('uid','')
-            ret = get_area(ip)
-            if ret.get('status') == 'success':
-                view_log = Viewlog(uid=uid, ip=ip, pid=pid, isp=ret.get('isp'), lon=ret.get('lon'), lat=ret.get('lat'))
-                view_log.save()
+            uid = request.COOKIES.get('uid',-1)
+            # ret = get_area(ip)
+            # if ret.get('status') == 'success':
+            view_log = Viewlog(uid=uid, ip=ip, pid=pid)
+            view_log.save()
         except:
             pass
         comments = Comment.objects.filter(Q(pid=pid)&Q(pcid=-1)&Q(status=1))
@@ -174,19 +196,20 @@ def blog_thumbs(request):
         pid = request.GET.get('id', '')
         paper = getObject(Paper, id=pid)
         kind = request.GET.get('kind', '')
-        uid = request.COOKIES.get('uid','')
-        ip = get_client_ip()
-        if kind == 0:
+        uid = request.COOKIES.get('uid', -1)
+        ip = get_client_ip(request)
+        if int(kind) == 0:
             thumb = Thumbs(uid=uid, ip=ip, pid=pid, is_dislike=1)
             paper.dislike += 1
+            info = "emmmmmmmmmmm...."
         else:
             thumb = Thumbs(uid=uid, ip=ip, pid=pid)
             paper.like += 1
+            info = "谢谢你的支持"
         try:
             thumb.save()
             paper.save()
             status = 1
-            info = "谢谢你的支持"
         except Exception as e:
             status = 0
             info = "出问题了...<br>" + str(e)
@@ -204,6 +227,32 @@ def paper_comment(request):
         pid = request.POST.get('pid', '')
         pcid = request.POST.get('pcid', '')
         content = request.POST.get('content', '')
-        comment = Comment(pid=pid, uid=uid, ruid=ruid, pcid=pcid, content=content)
+        create_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        comment = Comment(pid=pid, uid=uid, ruid=ruid, pcid=pcid, content=content,data=create_time)
         comment.save()
+        ruser = getObject(Users, id=ruid)
+        user = getObject(Users, id=uid)
+        mail = getObject(Emailsetting, status=1)
+        paper = getObject(Paper, id=pid)
+        config = Config.objects.all()
+        if config:
+            message_header = config[0].title
+        else:
+            message_header = WEB_TITLE
+        mail_message = """
+        <p> %s DD </p>
+        <p> %s... </p>
+        <a href="%s/blog/paper_detail/?pid=%s"> %s </a>
+        """ % ('user.username', '', WEB_URL, 'pid', '')
+        message = MIMEText(mail_message, 'html', 'utf-8')
+        message['From'] = Header(message_header, 'utf-8')
+        message['To'] = '评论回复'
+        subject = '评论回复'
+        message['Subject'] = Header(subject, 'utf-8')
+        reciver = []
+        if not ruser:
+            reciver.append(mail.user)
+        else:
+            reciver.append(ruser.email)
+        send_mail(mail, reciver, message.as_string())
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))

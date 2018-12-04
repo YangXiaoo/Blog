@@ -73,6 +73,7 @@ class Paper(models.Model):
     litpic = models.CharField(max_length = 200, null=True)
     top = models.IntegerField(default = 0, null=True)
     status = models.IntegerField(default = 1, null=True)
+    secrete = models.IntegerField(default = 0, null=True)
 
 
 class Comment(models.Model):
@@ -81,7 +82,7 @@ class Comment(models.Model):
     ruid = models.IntegerField(default=0, null=True)
     pcid = models.IntegerField(default = -1, null=True) # 默认无父元素
     content = models.CharField(max_length = 1000, null=False)
-    data = models.DateField(auto_now=True, auto_now_add=True)
+    data = models.DateField(auto_now=True, null=False)
     status = models.IntegerField(default = 1, null=True)
     like = models.IntegerField(default = 0, null=True)
     dislike = models.IntegerField(default = 0, null=True)

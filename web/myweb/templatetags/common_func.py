@@ -4,6 +4,8 @@
 
 from django import template
 from django.utils.safestring import mark_safe
+from django.db.models import Q
+
 register = template.Library()
 from admin.models import *
 from myweb.models import *
@@ -14,28 +16,30 @@ def get_config(par):
     config = Config.objects.all()
     if config:
         config = config[0]
-        values = {  'title' : config.title,\
-                    'keywords': config.keywords,\
-                    'description' : config.description,\
-                    'copyright' : config.copyright,\
-                    'web_logo' : config.web_logo,\
-                    'record' : config.record,\
-                    'address' : config.address,\
-                    'web_owner' : config.web_owner,\
-                    'default_img' : config.default_img}
+        values = {  
+            'title' : config.title,
+            'keywords': config.keywords,
+            'description' : config.description,
+            'copyright' : config.copyright,
+            'web_logo' : config.web_logo,
+            'record' : config.record,
+            'address' : config.address,
+            'web_owner' : config.web_owner,
+            'default_img' : config.default_img,
+        }
         return values.get(par, '')
     return ''
 
 
 @register.filter
 def category(par,nums):
-    cate = Category.objects.order_by(str(par))[: int(nums)]
+    cate = Category.objects.filter(status=1).order_by(str(par))[: int(nums)]
     return cate
 
 
 @register.filter
 def hot_paper(par,nums):
-    p = Paper.objects.order_by(str(par))[: int(nums)]
+    p = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by(str(par))[: int(nums)]
     return p
 
 
@@ -61,12 +65,14 @@ def reply(pid):
 @register.filter
 def user_info(uid,par):
     user = getObject(Users, id=uid)
-    if par == 'profile':
-        return user.profile
-    elif par == 'username':
-        return user.username
-    else:
-        return 'error request'
+    if user:
+        if par == 'profile':
+            return user.profile
+        elif par == 'username':
+            return user.username
+        else:
+            return 'error request'
+    return 'None'
 
 
 @register.filter
@@ -78,13 +84,13 @@ def reply_user(cid,ruid):
 
 
 @register.filter
-def web_map():
+def web_map(par):
     category = Category.objects.filter(status=1)
     return category
 
 
 @register.filter
-def blogroll():
+def blogroll(par):
     r = Blogroll.objects.filter(status=1)
     return r
 

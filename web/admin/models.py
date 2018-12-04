@@ -21,6 +21,7 @@ class Config(models.Model):
     create_data = models.DateTimeField(auto_now=True, null=True)
 
 
+
 class UpFiles(models.Model):
     typeid  = models.IntegerField(default = 0, null=True) # 文件类型,blog=0, litpic=1, sql=2, file=3
     file_name = models.CharField(max_length=100, blank=False, null=False)
@@ -72,7 +73,7 @@ class Viewlog(models.Model):
     """
     uid = models.IntegerField(default = -1, null=True)
     ip = models.CharField(max_length=20)
-    date = models.DateField(auto_now=True, null=True)
+    date = models.DateField(auto_now=True)
     area = models.CharField(max_length=50, null=True)
     pid = models.CharField(max_length=100)
     isp = models.CharField(max_length=50, null=True)
@@ -100,3 +101,12 @@ class Thumbs(models.Model):
     pid = models.IntegerField()
     is_dislike = models.IntegerField(default = 0, null=True)
     date = models.DateField(auto_now=True, null=True)
+
+
+class Emailsetting(models.Model):
+    host = models.CharField(max_length=20)
+    port = models.IntegerField(max_length=10,default=465)
+    user = models.CharField(max_length=50)
+    password = models.CharField(max_length=50)
+    description = models.CharField(max_length=50, null=True)
+    status = models.IntegerField(default = 1, null=True)

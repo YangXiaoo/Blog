@@ -15,10 +15,6 @@
                 <h1>
                     文章列表
                 </h1>
-                <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                    <li class="active">Dashboard</li>
-                </ol>
             </section>
 
             <!-- Main content -->
@@ -44,6 +40,7 @@
                                         <th>创建时间</th>
                                         <th>编辑时间</th>
                                         <th>状态</th>
+                                        <th>隐私</th>
                                         <th>操作</th>
                                     </tr>
                                     {% for p in papers.object_list %}
@@ -64,6 +61,11 @@
                                             <a href="javascript:void(0);" data-id="{{ p.id }}" data-field="status" 
                                             data-value="{{ p.status }}" data-url="{% url 'paper_edit_inline' %}"
                                             class='editimg fa {% ifequal p.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0);" data-id="{{ p.id }}" data-field="secrete" 
+                                            data-value="{{ p.secrete }}" data-url="{% url 'paper_edit_inline' %}"
+                                            class='editimg fa {% ifequal p.secrete 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
                                         </td>
                                         <td>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ p.id }}" target="_blank"><i class="fa fa-eye"></i>查看</a>

@@ -13,12 +13,8 @@
         <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    留言列表
+                    文章评论列表
                 </h1>
-                <ol class="breadcrumb">
-                    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                    <li class="active">Dashboard</li>
-                </ol>
             </section>
 
             <!-- Main content -->
@@ -55,7 +51,7 @@
                                             {{ c.user }}
                                         </td>
                                         <td>{{ c.ruser }}</td>
-                                        <td>{{ c.date }}</td>
+                                        <td>{{ c.data }}</td>
                                         <td>                                    <a href="javascript:void(0);" data-id="{{ c.id }}" data-field="status" 
                                             data-value="{{ c.status }}" data-url="{% url 'comment_edit_inline' %}"
                                             class='editimg fa {% ifequal c.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>

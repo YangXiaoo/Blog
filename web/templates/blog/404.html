@@ -1,0 +1,42 @@
+{% include 'blog/public/top.html' %}
+{% include 'blog/public/load_header.html' %}
+<div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title"></h1>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+            <div class="blog-post">
+            <br>
+                {% if error %}
+                <h1>
+                    <div class="alert alert-danger text-center">
+                        {{ error }}
+                    </div>
+                </h1>
+                {% endif %} 
+                <hr>
+                <br>
+            </div>
+        </div><!-- /.blog-main -->
+
+        <!-- sidebar -->
+        <div class="col-sm-2 col-sm-offset-1 blog-sidebar">
+            <div class="sidebar-module sidebar-module-inset alert alert-warning"  role="alert">
+                <h4>注意！</h4>
+                <p>著作版权归本网站所有，若有侵权，请联系。</p>
+            </div>
+
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-info" >文档分类</h4>{% include 'blog/public/cate.html' %}
+            </div><hr>
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-danger">热门文章</h4>
+                {% include 'blog/public/hot.html' %}
+            </div><hr>
+        </div><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+{% include 'blog/public/bottom.html' %}

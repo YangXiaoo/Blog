@@ -22,7 +22,6 @@ urlpatterns = patterns('admin.views',
     url(r'^paper_del$', 'paper_del', name='paper_del'),
     url(r'^admin_markdown_upload_image$', 'admin_markdown_upload_image', name='admin_markdown_upload_image'),
 
-
     # user management
     url(r'^user_list$', 'user_list', name='user_list'),
     url(r'^user_add$', 'user_add', name='user_add'),
@@ -40,11 +39,20 @@ urlpatterns = patterns('admin.views',
     url(r'^blog_message_list$', 'blog_message_list', name='blog_message_list'),
 
 
-    # webconfig
+    # web config
     url(r'^web_config$', 'web_config', name='web_config'),
     url(r'^web_file$', 'web_file', name='web_file'),
     url(r'^file_edit_inline$', 'file_edit_inline', name='file_edit_inline'),
     url(r'^web_file_del$', 'web_file_del', name='web_file_del'),
+
+
+    # email settings
+    url(r'^email_setting$', 'email_setting', name='email_setting'),
+    url(r'^email_add$', 'email_add', name='email_add'),
+    url(r'^email_edit$', 'email_edit', name='email_edit'),
+    url(r'^email_edit_inline$', 'email_edit_inline', name='email_edit_inline'),
+    url(r'^email_del$', 'email_del', name='email_del'),
+    url(r'^email_test$', 'email_test', name='email_test'),
 
 
     # tool

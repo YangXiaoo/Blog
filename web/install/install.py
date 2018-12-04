@@ -247,6 +247,9 @@ class PreSetup(object):
 
     def _input_smtp(self):
         while True:
+            set_email = raw_input('是否设置邮箱? (y/n) [y]: ')
+                if set_email == 'n':
+                    break
             mail_host = str(raw_input('请输入SMTP地址: ').strip())
             mail_port = raw_input('请输入SMTP端口 [465/25]: ').strip()
             self.mail_addr = str(raw_input('请输入账户: ').strip())

@@ -15,10 +15,6 @@
                 <h1>
                     用户列表
                 </h1>
-                <ol class="breadcrumb">
-                    <li><a href="{% url 'admin_index' %}"><i class="fa fa-dashboard"></i> Home</a></li>
-                    <li class="active">Dashboard</li>
-                </ol>
             </section>
 
             <!-- Main content -->
@@ -56,7 +52,7 @@
                                             <span class="editable" data-pk="{{ u.id }}" data-name="{{ u.name }}" data-url="{% url 'user_edit_inline' %}">{{ u.name }}</span>
                                         </td>
                                         <td>
-                                            {{ u.eamil }}
+                                            {{ u.email }}
                                         </td>
                                         <td>{{ u.log_total }}</td>
                                         <td>

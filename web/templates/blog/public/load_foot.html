@@ -4,7 +4,7 @@
         <div class="col-sm-6" style="padding: 0px 0px 20px 0px;">
             <div class="row" align="center" style="margin: 0px; padding: 0px 0px 20px 0px;">
                 <h4 style="color: #EAEAEA;"> <i class="fa fa-paper-plane-o">网站地图</i></h4>
-                    {% for c in web_map %}
+                    {% for c in ''|web_map %}
                     <div class="col-sm-6 col-xs-6">
                         <a href="{% url 'category_detail' %}?cid={{ c.id }}"  target="_blank" >
                             {{ c.category_name }}
@@ -17,9 +17,9 @@
         <div class="col-sm-6"  style="border-left:2px solid #8a8080;">
             <div>
                 <h4 style="color: #EAEAEA;"><i class="fa fa-chain">常用链接</i></h4>
-                {% for b in blogroll %}
+                {% for b in  ''|blogroll %}
                 <div class="col-sm-6 col-xs-6">
-                    <a href="b.web_link"  target="_blank" >
+                    <a href="{{ b.web_link }}"  target="_blank" >
                         {{ b.web_name }}
                     </a>
                 </div>

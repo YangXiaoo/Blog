@@ -13,8 +13,9 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from django.core.mail import send_mail
+
 from email.mime.text import MIMEText
+from email.header import Header
 from email.utils import formataddr
 from smtplib import SMTP, SMTP_SSL, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
  
@@ -51,35 +52,17 @@ def getObject(model, **kwargs):
         the_object = None
     return the_object
 
-def colorPrint(msg, color='red', exits=False):
-    """
-    颜色打印字符或者退出
-    参考：https://www.cnblogs.com/hellojesson/p/5961570.html
-    """
-    color_msg = {'blue': '\033[1;36m%s\033[0m',
-                 'green': '\033[1;32m%s\033[0m',
-                 'yellow': '\033[1;33m%s\033[0m',
-                 'red': '\033[1;31m%s\033[0m',
-                 'title': '\033[30;42m%s\033[0m',
-                 'info': '\033[32m%s\033[0m'}
-    msg = color_msg.get(color, 'red') % msg  
-    print(msg)
-    if exits:
-        time.sleep(2)
-        sys.exit()
-    return msg
-
 
 def defendAttack(func):
     def _deco(request, *args, **kwargs):
         if int(request.session.get('visit', 1)) > 10:
-            logger.debug('请求次数: %s' % request.session.get('visit', 1))
             Frobidden = '<h1>Forbidden.403.请求次数过多，请稍后再试。</h1>'
             return HttpResponse(Frobidden, status=403)
         request.session['visit'] = request.session.get('visit', 1) + 1
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
     return _deco
+
 
 def mkdir(dir_name, username='', mode=755):
     """
@@ -89,6 +72,7 @@ def mkdir(dir_name, username='', mode=755):
     bash(cmd)
     if username:
         chown(dir_name, username)
+
 
 def chown(path, user, group=''):
     if not group:
@@ -100,6 +84,7 @@ def chown(path, user, group=''):
     except KeyError:
         pass
 
+
 def get_tmp_dir(dirs='static/files'):
     seed = uuid.uuid4().hex[:4]
     now = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
@@ -108,6 +93,7 @@ def get_tmp_dir(dirs='static/files'):
     dir_name = os.path.join(path, file_path)
     mkdir(dir_name, mode=777)
     return dir_name,file_path
+
 
 def get_client_ip(request):
     try:
@@ -139,7 +125,42 @@ def admin_require_login(func):
     """
     def _deco(request, *args, **kwargs):
         if request.session.get('role_id', '') != 0:
-            return render_to_response(reverse('admin_login'))
+            return HttpResponseRedirect(reverse('admin_login'))
         else:
             return func(request, *args, **kwargs)
     return _deco
+
+
+def file_delete(file):
+    bash('rm -f %s*' % file.dirs)
+
+
+
+def test_mail(email):
+    try:
+        if email.port == 465:
+            smtp = SMTP_SSL(email.host, port=email.port, timeout=10)
+        else:
+            smtp = SMTP(email.host, port=email.port, timeout=10)
+        smtp.login(email.user, email.password)
+        smtp.sendmail(email.user, (email.user, ),
+                      '''From:%s\r\nTo:%s\r\nSubject:Mail Test!\r\n\r\n  Mail test passed!\r\n''' %
+                      (email.user, email.user))
+        smtp.quit()
+        return True
+    except Exception as e:
+        return False
+
+
+def send_mail(email, address, content):
+    try:
+        if email.port == 465:
+            smtp = SMTP_SSL(email.host, port=email.port, timeout=10)
+        else:
+            smtp = SMTP(email.host, port=email.port, timeout=10)
+        smtp.login(email.user, email.password)
+        smtp.sendmail(email.user, address, content)
+        smtp.quit()
+        return True
+    except Exception as e:
+        return False

@@ -19,8 +19,11 @@ from myweb.settings import *
 from api import *
 
 import ConfigParser
+from email.mime.text import MIMEText
+from email.header import Header
 
 WEB_URL = 'http://www.lxa.kim'
+WEB_TITLE = '杨潇-博客'
 
 
 @defendAttack
@@ -34,11 +37,20 @@ def admin_login(request):
         if username and password:
             userinfo = getObject(Users, username=username)
             if userinfo is not None:
-                if userinfo.is_active == 1 and userinfo.password == password and userinfo.is_admin == 1:
-                    request.session['role_id'] = 0
-                    request.session.set_expiry(3600)
-                    response = render_to_response(reverse('admin_index'), {})
-                    return response
+                if userinfo.is_active == 1 :
+                    if  userinfo.password == password :
+                        if userinfo.is_admin == 1:
+                            request.session['role_id'] = 0
+                            request.session['uid'] = userinfo.id
+                            request.session.set_expiry(3600)
+                            response= HttpResponseRedirect(reverse('admin_index'))
+                            response.set_cookie('profile',userinfo.profile)
+                            response.set_cookie('username',userinfo.username)
+                            return response
+                        else:
+                            error = '不是管理员'
+                    else:
+                        error = '密码错误'
                 else:
                     error = '用户未激活'
             else:
@@ -54,8 +66,12 @@ def admin_logout(request):
     '''
     注销
     '''
-    request.session['role_id'] = ''
-    return HttpResponseRedirect(reverse('admin_login'))
+    del request.session['role_id']
+    del request.session['uid']
+    response = HttpResponseRedirect(reverse('admin_login'))
+    response.delete_cookie('username')
+    response.delete_cookie('profile')
+    return response
 
 
 @admin_require_login
@@ -125,6 +141,9 @@ def category_edit_inline(request):
                 p.save()
         elif secrete != '':
             category.secrete = secrete
+            for p in papers:
+                p.secrete = secrete
+                p.save()
         else:
             category.category_name = c_name
             for p in papers:
@@ -152,7 +171,7 @@ def category_del(request):
                 p.delete()
             c.delete()
             status = 1
-            info = 'delete success!'
+            info = 'delete successful!'
         except:
             status = 0
             info = 'fail'
@@ -171,26 +190,54 @@ def paper_list(request):
 def paper_add(request):
     if request.method == "POST":
         cid = request.POST.get('typeid','')
-        title = request.POST.get('title','')
-        tag = request.POST.get('tag','')
-        jumplink = request.POST.get('jumplink','')
-        litpic = request.POST.get('litpic','')
-        content = request.POST.get('content','')
-        author = request.POST.get('author','')
-        source = request.POST.get('source','')
-        keywords = request.POST.get('keywords','')
-        description = request.POST.get('description','')
-        views = request.POST.get('views', 0)
-        like = request.POST.get('like', 0)
-        dislike = request.POST.get('dislike', 0)
-        status = request.POST.get('status', 1)
-        data = request.POST.get('create_time',time.strftime('%Y-%m-%d',time.localtime(time.time())))
+        keys = ['title', 'tag', 'jumplink', 'litpic', 
+            'content', 'author', 'source', 'keywords',
+             'description', 'views', 'like', 'dislike',
+              'status', 'secrete']
+        data = {}
+        for k in keys:
+            data[k] = request.POST.get(k, '')
+        for k in ['views', 'like', 'dislike']:
+            data[k] = [data[k], 0][data[k] == '']
+        create_time = request.POST.get('create_time')
+        if create_time == '':
+            create_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))
         category = getObject(Category, id=cid).category_name
-        paper = Paper(cid=cid, title=title, category=category, tag=tag, jumplink=jumplink,litpic=litpic, content=content, author=author, source=source, keywords=keywords, description=description, views=views, like=like, dislike=dislike, status=status, data=data)
+        paper = Paper(cid=cid, category=category, data=create_time, **data)
         paper.save()
         category = getObject(Category, id=cid)
         category.paper_total += 1
         category.save()
+
+        # send mail
+        if data['secrete'] != 1 and data['status'] != 0:
+            users = Users.objects.all()
+            recivers = []
+            for u in users:
+                recivers.append(u.email)
+            p = getObject(Paper, title=data['title'])
+            if p:
+                pid = p.id
+            else:
+                pid = 1
+            mail = getObject(Emailsetting, status=1)
+            config = Config.objects.all()
+            if config:
+                message_header = config[0].title
+            else:
+                message_header = WEB_TITLE
+            mail_message = """
+            <p> 快来围观！ </p>
+            <p> %s </p>
+            <a href="%s/blog/paper_detail/?pid=%s"> %s </a>
+            """ % ('None', WEB_URL, pid, '')
+            message = MIMEText(mail_message, 'html', 'utf-8')
+            message['From'] = Header(message_header, 'utf-8')
+            message['To'] = '求围观'
+            subject = '有新文章发布~'
+            message['Subject'] = Header(subject, 'utf-8')
+            send_mail(mail, recivers, message.as_string())
+
         return HttpResponseRedirect(reverse('paper_list'))
     cate = Category.objects.all()
     return render_to_response('admin/paper/paper_add.html', locals(), context_instance=RequestContext(request))
@@ -198,6 +245,7 @@ def paper_add(request):
 
 def paper_edit(request):
     if request.method == "POST":
+        # 待简化
         id = request.POST.get('pid','')
         cid = request.POST.get('typeid','')
         category = getObject(Category, id=cid).category_name
@@ -230,17 +278,21 @@ def paper_edit_inline(request):
         pid = request.GET.get('id', )
         name = request.GET.get('name', '')
         status = request.GET.get('status','')
+        secrete = request.GET.get('secrete', '')
     elif request.method == "POST":
         pid = request.POST.get('id', )
         name = request.POST.get('name', '')
         status = request.POST.get('status','')
+        secrete = request.POST.get('secrete', '')
     paper = getObject(Paper, id=pid)
 
     try:
         if status != '':
             paper.status = status
-        else:
+        elif name != '':
             paper.title = name
+        elif secrete != '':
+            paper.secrete = secrete
         paper.save()
         status = 1
         info = 'ok'
@@ -264,6 +316,106 @@ def paper_del(request):
             p.delete()
             status = 1
             info = 'delete success!'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
+
+
+
+def email_setting(request):
+    if EMAIL_HOST_PASSWORD:
+        if not getObject(Emailsetting, password=EMAIL_HOST_PASSWORD):
+            try:
+                email = Emailsetting(host=EMAIL_HOST, port=EMAIL_PORT, user=EMAIL_HOST_USER, password=EMAIL_HOST_PASSWORD, status=int(MAIL_ENABLE))
+                email.save()
+            except:
+                pass
+    emails = Emailsetting.objects.all()
+    email_list, p, email, page_range, current_page, show_first, show_end = pages(emails, request)
+    return render_to_response('admin/config/email_setting.html', locals(), context_instance=RequestContext(request)) 
+
+
+def email_test(request):
+    if request.method == "POST":
+        eid = request.POST.get('id', '')
+        e = getObject(Emailsetting, id=eid)
+        try:
+            if test_mail(e):
+                status = 1
+                info = 'email test successful!'
+            else:
+                status = 0
+                info = 'fail'
+        except Exception as e:
+            status = 0
+            info = 'fail' + '<br>' + str(e)
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
+
+
+def email_add(request):
+    if request.method == "POST":
+        keys = ['host', 'port', 'user', 'password', 'status', 'description']
+        data = {}
+        for k in keys:
+            data[k] = request.POST.get(k, '')
+        email = Emailsetting(**data)
+        email.save()
+        return HttpResponseRedirect(reverse('email_setting'))
+    return render_to_response('admin/config/email_add.html')
+
+
+def email_edit(request):
+    if request.method == "GET":
+        eid = request.GET.get('id', '')
+        email = getObject(Emailsetting, id=eid)
+        return render_to_response('admin/config/email_edit.html', locals(), context_instance=RequestContext(request))
+    elif request.method == "POST":
+        eid = request.POST.get('id', '')
+        try:
+            keys = ['host', 'port', 'user', 'password', 'status', 'description']
+            data = {}
+            for k in keys:
+                data[k] = request.POST.get(k, '')
+            Emailsetting.objects.filter(id=eid).update(**data)
+        except:
+            pass
+        return HttpResponseRedirect(reverse('email_setting'))
+
+
+def email_edit_inline(request):
+    if request.method == "POST":
+        eid = request.POST.get('id', '')
+        status = request.POST.get('status', '')
+        email = getObject(Emailsetting, id=eid)
+        try:
+            email.status = status
+            email.save()
+            status = 1
+            info = 'ok'
+        except:
+            status = 0
+            info = 'fail'
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
+
+
+def email_del(request):
+    if request.method == "GET":
+        eid = request.GET.get('id', '')
+        e = getObject(Emailsetting, id=eid)
+        try:
+            e.delete()
+            status = 1
+            info = 'delete successful!'
         except:
             status = 0
             info = 'fail'
@@ -373,11 +525,7 @@ def user_add(request):
         except Exception as e:
             status = 0
             info = str(e)
-        return HttpResponse(json.dumps({
-        "status": status,
-        "url" : '',
-        "info":info,
-        }))
+        return HttpResponseRedirect(reverse('user_list'))
     return render_to_response('admin/user/user_add.html', locals(), context_instance=RequestContext(request))
 
 
@@ -392,32 +540,27 @@ def user_edit(request):
         elif method == 'password':
             user.password = request.POST.get('password', '')
         elif method == 'avatar':
-            upload_files = request.FILES.getlist('imgFile', None)
-            date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-            upload_dir, filename_path = get_tmp_dir()
-            try:
-                url = ''
-                for upload_file in upload_files:
-                    file_path = '%s/%s' % (upload_dir, upload_file.name)
-                    file_dir = '%s/%s' % (filename_path, upload_file.name)
-                    size = upload_file.size
-                    up_file = UpFiles(typeid=1, file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
-                    up_file.save()
-                    with open(file_path,'w') as f:
-                        for chunk in upload_file.chunks():
-                            f.write(chunk)
-                    url = WEB_URL + file_path.split(BASE_DIR)[-1]
-                info = "upload file successful!"
-                success = 1
-            except Exception as e:
-                info = str(e)
-                url = WEB_URL + 'callback_fail'
-                success = 0
-            return HttpResponse(json.dumps({
-                        "success": success,
-                        "url" : url,
-                        "info":info,
-                    }))
+            # upload_files = request.FILES.getlist('imgFile', None)
+            # date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            # upload_dir, filename_path = get_tmp_dir()
+            # try:
+            #     url = ''
+            #     for upload_file in upload_files:
+            #         file_path = '%s/%s' % (upload_dir, upload_file.name)
+            #         file_dir = '%s/%s' % (filename_path, upload_file.name)
+            #         size = upload_file.size
+            #         up_file = UpFiles(typeid=1, file_name=upload_file.name,file_path=file_dir, dirs=file_path, size=size)
+            #         up_file.save()
+            #         with open(file_path,'w') as f:
+            #             for chunk in upload_file.chunks():
+            #                 f.write(chunk)
+            #         url = WEB_URL + file_path.split(BASE_DIR)[-1]
+            user.profile = request.POST.get('avatar', '')
+            # return HttpResponse(json.dumps({
+            #             "success": success,
+            #             "url" : url,
+            #             "info":info,
+            #         }))
         elif method == 'infos':
             user.user_info = request.POST.get('info', ''
                 )
@@ -652,6 +795,7 @@ def web_file_del(request):
         f = getObject(UpFiles, id=fid)
         try:
             f.delete()
+            file_delete(file)
             status = 1
             info = 'delete successful!'
         except:

@@ -98,6 +98,7 @@ ROOT_URLCONF = 'myweb.urls'
 WSGI_APPLICATION = 'myweb.wsgi.application'
 
 
+DEFAULT_CHARSET = 'UTF-8'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 

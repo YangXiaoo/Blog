@@ -20,7 +20,7 @@
                     </a>
                     <div class="tags font-ei ">
                         <i class="fa fa-tags" title="文章标签：{{ p.category }}" data-toggle="tooltip"> {{ p.category }}</i>&nbsp;
-                        <i class="fa fa-clock-o" title="时间：{{ p.date|date:"Y-m-j" }}" data-toggle="tooltip" > {{ p.date|date:"Y-m-j" }}</i>&nbsp;
+                        <i class="fa fa-clock-o" title="时间：{{ p.date|date:"Y-m-j" }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>&nbsp;
                         <i class="fa fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>&nbsp;
                         <i class="fa fa-thumbs-o-up" title="点赞：{{ p.like }}" data-toggle="tooltip" > {{ p.like }}</i>&nbsp;
                     </div>

@@ -41,12 +41,12 @@
                     </a>
                 </div>
                 <div class="pull-right">
-                    <button class="btn dislike arc-thumbs-down" type="button" data-id="{{ p.id }}" data-kind="0" data-url="{% url 'blog_thumbs' %}" title="差评" data-toggle="tooltip" >
+                    <button class="btn dislike arc-thumbs" type="button" data-id="{{ p.id }}" data-kind="0" data-url="{% url 'blog_thumbs' %}" title="差评" data-toggle="tooltip" >
                         <i class="fa fa-thumbs-o-down"></i>
                         <span>{{ p.dislike }}</span>
                     </button>    
 
-                    <button class="btn like arc-thumbs-up" type="button" data-id="{{ p.id }}" data-kind="1" data-url="{% url 'blog_thumbs' %}" title="点赞" data-toggle="tooltip" >
+                    <button class="btn like arc-thumbs" type="button" data-id="{{ p.id }}" data-kind="1" data-url="{% url 'blog_thumbs' %}" title="点赞" data-toggle="tooltip" >
                         <i class="fa fa-thumbs-o-up"></i>
                         <span>{{ p.like }}</span>
                     </button>  
@@ -61,52 +61,54 @@
             </div>
           <!-- /.blog-post -->
 
-            <div class="box-body">
+            <div class="box-footer box-comments">
                 {% for  c in comments %}
-                <div class="item bs-callout bs-callout-gray">
-                    <img src="{{ c.uid|user_info:'profile' }}" alt="{{ c.uid|user_info:'profile' }}" height="20px" width="20pxt" class="offline">                
-                    <span>
-                        <a href="#" target="_blank" class="name">{{ c.uid|user_info:'username' }}</a>
+                <div class="box-comment">
+                    <img src="{{ c.uid|user_info:'profile' }}" alt="{{ c.uid|user_info:'profile' }}" class="img-circle img-sm"">  
+                    <div class="comment-text">              
+                        <span>
+                            <a href="#" target="_blank" class=""username"">{{ c.uid|user_info:'username' }}</a>
 
-                        <small class="text-muted"><i class="fa fa-clock-o"></i> {{ c.date|date:"Y-m-j"}}</small>   
-                    </span>
-                    <br>
-                    <br>
+                            <small class="text-muted pull-right"><i class="fa fa-clock-o"></i> {{ c.data|date:"Y-m-j"}}</small>   
+                        </span>
+                    </div>
 
                     {{ c.content }}
 
                     {% ifnotequal request.COOKIES.uid None %}
                     <button href="javascript:void(0);" data-ruid="{{ c.uid }}" data-pcid="{{ c.id }}" class="btn btn-info btn-xs pull-right arc-btn">回复</button>
                     {% endifnotequal %}
-                    <br>
-                    <br>
 
                     {% for r in c.id|reply %}
                     {% ifnotequal r 0 %}
-                    <div class="arc-reply" >
+                    <div class="box-comment" >
                     
-                        <blockquote style="background-color: #F8F8FF;">
-                            <img src="{{ r.uid|user_info:'profile' }}" alt="{{ r.uid|user_info:'profile' }}" height="20px" width="20px" >
-                            
-                               <span> <a href="#" target="_blank" class="name">{{ r.uid|user_info:'username' }}</a>
+                        <blockquote>
+                            <img src="{{ r.uid|user_info:'profile' }}" alt="{{ r.uid|user_info:'profile' }}"  class="img-circle img-sm"">
+                            <div class="comment-text"> 
+                               <span> 
+                                    <a href="#" target="_blank" class="username">{{ r.uid|user_info:'username' }}</a>
                                </span>
-
-                                <i class="fa fa-clock-o" style="font-size:85%;">{{ r.date|date:"Y-m-j"}}</i>
+                               <small class="text-muted pull-right">
+                                    <i class="fa fa-clock-o">{{ r.data|date:"Y-m-j"}}</i>
+                                </small>
                             
-                            <p> 
-                                {% ifequal r.id|reply_user:c.uid 1 %}
-                                <a href="#">
-                                    @&nbsp;{{ r.ruid|user_info:'username' }}
-                                </a>>
-                                {% endifequal %}
+                                <p> 
+                                    {% ifequal r.id|reply_user:c.uid 1 %}
+                                    <a href="#">
+                                    @{{ r.ruid|user_info:'username' }}
+                                    </a>&nbsp;&nbsp;
+                                    {% endifequal %}
 
-                            {{ r.content }}</p>
-                            
-                            {% ifnotequal request.COOKIES.uid None %}
-                            <div align="left">
-                                <button href="javascript:void(0);" data-ruid="{{ r.uid }}" data-pcid="{{ c.id }}" class="btn btn-info btn-xs  arc-btn">回复</button>
+                                    {{ r.content }}
+                                </p>
+                                {% ifnotequal request.COOKIES.uid None %}
+                                <div align="left">
+                                    <button href="javascript:void(0);" data-ruid="{{ r.uid }}" data-pcid="{{ c.id }}" class="btn btn-info btn-xs  arc-btn">回复</button>
+                                </div>
+                                {% endifnotequal %}
                             </div>
-                            {% endifnotequal %}
+
                         </blockquote>
                     </div>
                     {% endifnotequal %}
@@ -123,6 +125,7 @@
                     </button>
                 </div>
                 {% endifnotequal %}
+                <hr>
             </div>
 
 
@@ -153,7 +156,7 @@
                 请先<a href="{% url 'login' %}">登录</a>，再发表留言。
             </div>
             {% endifnotequal %}
-
+            <hr>
         </div><!-- /.blog-main -->
 
         <!-- sidebar -->
