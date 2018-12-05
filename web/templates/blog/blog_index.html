@@ -28,9 +28,9 @@
                 </div><hr>
                 {% endfor %}
         
-                <div class="new-arc-box"></div>
+                <div class="new-load-box"></div>
                     <div class="x-mb-15">
-                        <button class="btn btn-block" id="new-arc-btn1" data-page="2"
+                        <button class="btn btn-block" id="new-load-btn" data-page="2" data-id="0" data-url="{% url 'blog_index' %}"
             data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 加载中..." style="background-color: #B4EEB4;">加载更多文章</button>
                     </div>
                 </div>
@@ -55,30 +55,4 @@
     </div><!-- /.row -->
 
 </div><!-- /.container -->
-
-<script type="text/javascript">
-$(function(){
-    $('body').off('click', '#new-arc-btn1');
-    $('body').on("click", '#new-arc-btn1', function(event) {
-        var _this = $(this);
-        var page = _this.data('page');
-        _this.button('loading');
-        $.ajax({
-            type: "get",
-            url: '{% url 'blog_index' %}',
-            data: {pages: page},
-            success: function(html) {
-                if(html != '') {
-                    $('.new-arc-box').append(html);
-                    _this.data("page", page + 1); //分页数+1
-                    _this.button('reset');
-                } else {
-                    _this.text('没了呀!!!');
-                }
-            }
-        });
-    });
-    $('[data-toggle="tooltip"]').tooltip();
-})
-</script>
 {% include 'blog/public/bottom.html' %}

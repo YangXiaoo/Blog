@@ -44,8 +44,15 @@ def hot_paper(par,nums):
 
 
 @register.filter
-def paper_list(par,nums=None):
-    p = Paper.objects.filter(cid=int(par))
+def paper_list(par,uid=None):
+    if uid:
+        user = getObject(Users, id=int(uid))
+        if user.is_admin == 1:
+            p = Paper.objects.filter(cid=int(par))
+        else:
+            p = Paper.objects.filter(Q(cid=int(par))&Q(secrete=0))
+    else:
+        p = Paper.objects.filter(Q(cid=int(par))&Q(secrete=0))
     return p
 
 
@@ -61,6 +68,12 @@ def reply(pid):
         reply_comment = [0]
     return reply_comment
 
+@register.filter
+def is_reply(pid):
+    reply_comment = Comment.objects.filter(pcid=pid)
+    if not reply_comment:
+        return 0
+    return 1
 
 @register.filter
 def user_info(uid,par):

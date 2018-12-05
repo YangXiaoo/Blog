@@ -18,6 +18,10 @@ $(function(){
     };
 
 
+    // tooltip
+    $('[data-toggle="tooltip"]').tooltip();
+
+
    $('body').off('click', '.up-btn');
     $('body').on("click", '.up-btn', function(event){
         var _this_up_btn = $(this); 
@@ -83,17 +87,71 @@ $(function(){
         var _this = $(this);
         var _form = $('.arc-form');
         if(_this.hasClass('arc-reply')){   //取消回复
-            _this.html('回复').removeClass('btn-danger arc-reply');
+            _this.html('回复');
+            _this.find('i').removeClass('fa fa-remove');
+            _this.find('i').addClass('fa fa-mail-reply');
+            _this.removeClass('arc-reply')
             $('.guestbook_box').append(_form);
             _form.find('input[name="ruid"]').val(0);
             _form.find('input[name="pcid"]').val(-1);
         }else{   //回复
-            $('.arc-btn').html('回复').removeClass('btn-danger arc-reply');   //其他按钮还原
-            _this.html('取消回复').addClass('btn-danger arc-reply');
-            var _item = _this.closest('.item');
+            _this.html('取消');
+            _this.find('i').removeClass('fa fa-mail-reply');
+            _this.find('i').addClass('fa fa-remove');
+            _this.addClass('arc-reply')
             _this.after(_form);
             _form.find('input[name="ruid"]').val(_this.data('ruid'));
             _form.find('input[name="pcid"]').val(_this.data('pcid'));           
         }
     });
+
+    $('body').off('click', '#new-load-btn');
+    $('body').on("click", '#new-load-btn', function(event) {
+        var _this = $(this);
+        var page = _this.data('page');
+        var id = _this.data('id');
+        var url_path = _this.data('url');
+        _this.button('loading');
+        var dataStr = jQuery.parseJSON( '{"id":"'+id+'","page":"'+page+'"}' );
+        $.ajax({
+            type: "post",
+            url: url_path,
+            dataType : 'json',
+            data: dataStr,
+            success: function(data) {
+                if (data.status == '1') {
+                    $('.new-load-box').append(data.info);
+                    _this.data("page", page + 1);
+                    _this.button('reset');
+                } else {
+                    _this.text('emmm, 没啦');
+                }
+            }
+        }); 
+    });
+
+    // nav bar scroll
+    var new_scroll_position = 0;
+    var last_scroll_position;
+    var header = document.getElementById("nav-head");
+
+    window.addEventListener('scroll', function(e) {
+        last_scroll_position = window.scrollY;
+
+        // Scrolling down
+        if (new_scroll_position < last_scroll_position && last_scroll_position > 80) {
+            // header.removeClass('slideDown').addClass('slideUp');
+            header.classList.remove("slideDown");
+            header.classList.add("slideUp");
+
+        // Scrolling up
+        } else if (new_scroll_position > last_scroll_position) {
+            // header.removeClass('slideUp').addClass('slideDown');
+            header.classList.remove("slideUp");
+            header.classList.add("slideDown");
+        }
+
+        new_scroll_position = last_scroll_position;
+    });
+
 });

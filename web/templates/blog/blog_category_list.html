@@ -14,7 +14,7 @@
                 {% for c in cate %}
                 <h3 class="label label-danger">{{ c.category_name }}</h3>
                 <ol>
-                    {% for p in c.id|paper_list %}
+                    {% for p in c.id|paper_list:request.session.role_id %}
                     <li>
                         <a href="{% url 'paper_detail' %}?pid={{ p.id }}" >{{ p.title }}</a>
                     </li>

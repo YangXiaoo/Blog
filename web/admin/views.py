@@ -210,7 +210,7 @@ def paper_add(request):
         category.save()
 
         # send mail
-        if data['secrete'] != 1 and data['status'] != 0:
+        if int(request.POST.get('secrete')) == 0 and int(request.POST.get('status')) == 1:
             users = Users.objects.all()
             recivers = []
             for u in users:
@@ -226,11 +226,12 @@ def paper_add(request):
                 message_header = config[0].title
             else:
                 message_header = WEB_TITLE
-            mail_message = """
+            mail_message = u"""
             <p> 快来围观！ </p>
-            <p> %s </p>
+            <p> 有新文章发布了！<br>
+                %s... </p>
             <a href="%s/blog/paper_detail/?pid=%s"> %s </a>
-            """ % ('None', WEB_URL, pid, '')
+            """ % (data.get('content')[:50], WEB_URL, pid, data.get('title'))
             message = MIMEText(mail_message, 'html', 'utf-8')
             message['From'] = Header(message_header, 'utf-8')
             message['To'] = '求围观'
@@ -661,7 +662,13 @@ def comment_edit(request):
     elif request.method == "POST":
         cid = request.POST.get('id', '')
         c = getObject(Comment, id=cid)
-        c.content = request.POST.get('content', '')
+
+        content = request.POST.get('content', '')
+        txt = [" ","\t","\r\n"]
+        rep = ["&nbsp;","&nbsp;&nbsp;&nbsp;&nbsp;","<br>","<br>"]
+        for i in range(len(txt)):
+            content = content.replace(txt[i], rep[i])
+        c.content = content
         c.status = request.POST.get('status', '')
         c.save()
         return HttpResponseRedirect(reverse('paper_comment_list'))

@@ -49,11 +49,11 @@
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">评论内容</label>
-                                            <div class="col-sm-7"><textarea class="form-control" style="resize:none;height:155px;" name="content" placeholder="{{ c.content }}">{{ c.content }}</textarea></div>
+                                            <div class="col-sm-7"><textarea class="form-control" style="resize:none;height:155px;" name="content" placeholder="{{ c.content|safe }}">{{ c.content|safe }}</textarea></div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">回复内容</label>
-                                            <div class="col-sm-7"><textarea class="form-control" style="resize:none;height:155px;" name="recontent" disabled="disabled" placeholder="{{ rc.content }}">{{ rc.content }}</textarea></div>
+                                            <div class="col-sm-7"><textarea class="form-control" style="resize:none;height:155px;" name="recontent" disabled="disabled" placeholder="{{ rc.content|safe }}">{{ rc.content|safe }}</textarea></div>
                                         </div>
                                         <div class="form-group">
                                             <label class="col-sm-2 control-label">状态</label>
