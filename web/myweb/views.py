@@ -36,7 +36,7 @@ def login(request):
                     request.session['role_id'] = 1
                 request.session['user_id'] = user.id
                 request.session.set_expiry(3600)
-                response= HttpResponseRedirect(reverse('blog_index'))
+                response= HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))
                 response.set_cookie('profile',user.profile)
                 response.set_cookie('username',user.username)
                 response.set_cookie('uid', user.id)
@@ -179,6 +179,7 @@ def category_detail(request):
     elif request.method == "POST":
         cid = request.POST.get('id', '')
         page = request.POST.get('page', '')
+        start = int(int(page) - 1) * 10
         cate = getObject(Category, id=cid)
         if cate.status == 0:
             error = '404, 该资源无法查看'
@@ -191,6 +192,15 @@ def category_detail(request):
             papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0))
         else:
             papers = Paper.objects.filter(Q(cid=cid)&Q(status=1))
+        papers = papers[start : start + 10]
+        ret = ''
+        for p in papers:
+            ret += u"""<div class="list-arc-item "><a href="/blog/paper_detail/?pid=%s" title="%s"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-tags" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.id, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+        status = [1, 0][len(papers) == 0]
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": ret
+                })) 
         return render_to_response('blog/paper_load_more.html', locals(), context_instance=RequestContext(request))
 
 
@@ -231,7 +241,40 @@ def paper_detail(request):
                 return render_to_response('blog/login.html',{'error':error})
         start = (int(page) - 1) * 10
         comments = Comment.objects.filter(Q(pid=pid)&Q(pcid=-1)&Q(status=1))[start : start + 10]
-        return render_to_response('blog/comment_load_more.html', locals(), context_instance=RequestContext(request))
+        ret = ''
+        for c in comments:
+            user_info = getObject(Users, id=c.uid)
+            ruser_info = getObject(Users, id=c.ruid)
+            user_login = request.session.get('user_id', False)
+            ret += u"""<div class="box-comment"><img src="%s" alt="%s" class="img-circle img-md""><div class="comment-text"><span  class="username"><a href="#" target="_blank">%s</a><span class="text-muted pull-right"><i class="fa fa-clock-o"></i> %s</span></span>%s""" % (user_info.profile, user_info.profile, user_info.username, c.data, c.content)
+
+            if user_login:
+                ret += u"""<br><div class=""><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btn pull-right"><i class="fa fa-mail-reply "></i>回复</a></div>""" % (c.uid, c.id)
+            if is_reply(c.id) == 1:
+                ret += "<hr>"
+
+            for r in reply(c.id):
+                if r != 0:
+                    user = getObject(Users, id=r.uid)
+                    ruser = getObject(Users, id=r.ruid)
+                    ret += u"""<div class="box-comment"><img src="%s" alt="%s"  class="img-circle img-md"><div class="comment-text"><span  class="username"><a href="#" target="_blank">%s</a><span class="text-muted pull-right"><i class="fa fa-clock-o">%s</i></span></span>""" % (user.profile, user.profile, user.username, r.data)
+
+                    if reply_user(r.id, c.uid) == 1:
+                        ret += """<a href="#" class="font-blue">@%s</a><br>""" % ruser.username
+
+                    ret += r.content + "</div>"
+
+                    if user_login:
+                        ret += """<div class=""><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btnpull-right"><i class="fa fa-mail-reply "></i>回复</a></div>""" % (r.uid, c.id)
+                    ret += "</div>"
+                ret += "</div>"
+        ret += "</div>" + "</div>"
+
+        status = [1, 0][len(comments) == 0]
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": ret
+                })) 
 
 
 def blog_category_list(request):
@@ -268,8 +311,8 @@ def blog_search(request):
                 Q(content__contains=k)
                 )
         for p in papers:
-            p.title = p.title.replace(k, '<b><i class="font-red">' + str(k) + '</i></b>')
-            p.description = p.description.replace(k, '<b><i class="font-red">' + str(k) + '</i></b>')
+            p.title = p.title.replace(k, u'<b><i class="font-red">' + str(k) + '</i></b>')
+            p.description = p.description.replace(k, u'<b><i class="font-red">' + str(k) + '</i></b>')
         total = len(papers)
         return render_to_response('blog/search.html', locals(), context_instance=RequestContext(request))
 
@@ -348,3 +391,21 @@ def paper_comment(request):
             reciver.append(ruser.email)
         send_mail(mail, reciver, message.as_string())
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))
+
+def reply(pid):
+    reply_comment = Comment.objects.filter(pcid=pid)
+    if not reply_comment:
+        reply_comment = [0]
+    return reply_comment
+
+def is_reply(pid):
+    reply_comment = Comment.objects.filter(pcid=pid)
+    if not reply_comment:
+        return 0
+    return 1
+
+def reply_user(cid,ruid):
+    comment = getObject(Comment, id=cid)
+    if comment.ruid == ruid:
+        return 0
+    return 1
