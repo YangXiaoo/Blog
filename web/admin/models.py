@@ -59,12 +59,13 @@ class Loginlog(models.Model):
     ip = models.CharField(max_length=20)
     province = models.CharField(max_length=50, null=True)
     city = models.CharField(max_length=50, null=True)
-    county = models.CharField(max_length=50, null=True)
+    district = models.CharField(max_length=50, null=True)
     area = models.CharField(max_length=50, null=True)
     isp = models.CharField(max_length=50, null=True)
     date = models.DateField(auto_now=True)
-    lon = models.CharField(max_length=10, null=True)
-    lat = models.CharField(max_length=10, null=True)
+    lon = models.CharField(max_length=20, null=True)
+    lat = models.CharField(max_length=20, null=True)
+    agent = models.CharField(max_length = 300, null=True)
 
 
 class Viewlog(models.Model):
@@ -74,11 +75,13 @@ class Viewlog(models.Model):
     uid = models.IntegerField(default = -1, null=True)
     ip = models.CharField(max_length=20)
     date = models.DateField(auto_now=True)
-    area = models.CharField(max_length=50, null=True)
+    province = models.CharField(max_length=50, null=True)
+    city = models.CharField(max_length=50, null=True)
     pid = models.CharField(max_length=100)
     isp = models.CharField(max_length=50, null=True)
-    lon = models.CharField(max_length=10, null=True)
-    lat = models.CharField(max_length=10, null=True)
+    lon = models.CharField(max_length=20, null=True)
+    lat = models.CharField(max_length=20, null=True)
+    agent = models.CharField(max_length = 300, null=True)
 
 
 class Databases(models.Model):
@@ -101,6 +104,7 @@ class Thumbs(models.Model):
     pid = models.IntegerField()
     is_dislike = models.IntegerField(default = 0, null=True)
     date = models.DateField(auto_now=True, null=True)
+    agent = models.CharField(max_length = 300, null=True)
 
 
 class Emailsetting(models.Model):

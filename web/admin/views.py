@@ -1,8 +1,7 @@
 # coding:UTF-8
-from __future__ import division 
+# 2018-11-28 - 2018-12- 
 import uuid 
-import urllib
-import time
+import time,datetime
 import json
 
 from django.db.models import Count
@@ -10,6 +9,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseNotFound
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.db.models import Q
 
 from myweb.api import *
@@ -40,6 +40,15 @@ def admin_login(request):
                 if userinfo.is_active == 1 :
                     if  userinfo.password == password :
                         if userinfo.is_admin == 1:
+                            try:
+                                agent = request.META.get('HTTP_USER_AGENT','')
+                                ip = get_client_ip(request)
+                                ret = get_area(ip)
+                                if ret.get('status', 1) == 0:
+                                    login_log = Loginlog(uid=userinfo.id, name=userinfo.username, ip=ip, province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'],district=ret['content']['address_detail']['district'],lon=ret['content']['point']['x'], lat=ret['content']['point']['y'], agent=agent)
+                                    login_log.save()
+                            except:
+                                pass
                             request.session['role_id'] = 0
                             request.session['uid'] = userinfo.id
                             request.session.set_expiry(3600)
@@ -66,11 +75,14 @@ def admin_logout(request):
     '''
     注销
     '''
-    del request.session['role_id']
-    del request.session['uid']
     response = HttpResponseRedirect(reverse('admin_login'))
-    response.delete_cookie('username')
-    response.delete_cookie('profile')
+    try:
+        del request.session['role_id']
+        del request.session['uid']
+        response.delete_cookie('username')
+        response.delete_cookie('profile')
+    except:
+        pass
     return response
 
 
@@ -79,6 +91,95 @@ def admin_index(request):
     '''
     主页
     '''
+    papers = Paper.objects.all()
+    paper_total = len(papers)
+
+    view_log = Viewlog.objects.all()
+    view_total = len(view_log)
+
+    users = Users.objects.all()
+    user_total = len(users)
+
+    like = Thumbs.objects.filter(is_dislike=0)
+    like_total = len(like)
+    # dt_s= datetime.datetime.now()
+    # dt_e = (dt_s - datetime.timedelta(30))
+    # like_new = Thumbs.objects.filter(Q(date__range=[dt_s, dt_e])&Q(is_dislike=0))
+    # dt_s = (dt_e - datetime.timedelta(30))
+    # like_old = Thumbs.objects.filter(Q(date__range=[dt_e, dt_s])&Q(is_dislike=0))
+    # like_increase = like_new // like_old * 100
+    dislike = Thumbs.objects.filter(is_dislike=1)
+    dislike_total = len(dislike)
+
+    comments = Comment.objects.all()
+    comments_total = len(comments)
+
+    # login stastics
+    now = datetime.datetime.now()
+    start = now - datetime.timedelta(days=30)
+
+    login_log = Loginlog.objects.filter(date__gt=start)  
+
+    login_line_x, login_line_y = [], []
+    dicts = {}
+    for l in login_log:
+        login_time = l.date.strftime('%Y-%m-%d')
+        dicts[login_time] = dicts.get(login_time, 0) + 1
+    sorts = sorted(dicts.items(), key=lambda x:x[0], reverse=True)
+    for k, v in sorts:
+        login_line_x.append(k)
+        login_line_y.append(v)
+
+    login_line_x, login_line_y = json.dumps(login_line_x), json.dumps(login_line_y)
+
+    # paper view stastics
+    view_log = Viewlog.objects.filter(date__gt=start)   
+    paper_view_line_x, paper_view_line_y = [], []
+    dicts = {}
+    for v in view_log:
+        view_time = v.date.strftime('%Y-%m-%d')
+        dicts[view_time] = dicts.get(view_time, 0) + 1
+    sorts = sorted(dicts.items(), key=lambda x:x[0], reverse=True)
+    for k, v in sorts:
+        paper_view_line_x.append(k)
+        paper_view_line_y.append(v)
+
+    paper_view_line_x, paper_view_line_y = json.dumps(paper_view_line_x), json.dumps(paper_view_line_y)
+
+    # user active stastics
+    views = Viewlog.objects.all()
+    user_active_data = []
+    value = {}
+    corrdinate = {}
+    for v in views:
+        value[v.city] = value.get(v.city, 0) + 1
+        if v.city not in views:
+            corrdinate[v.city] = [v.lon, v.lat]
+    for k, v in corrdinate.items():
+        if k:
+            tmp = {}
+            tmp['name'] = k 
+            tmp['value'] = v.append(value.get(k))
+            user_active_data.append(tmp)
+    user_active_data.append({'name':'云浮市', 'value':[112.05094596,22.93797569,40]})
+    user_active_data = json.dumps(user_active_data)
+
+    # recent login log stastics
+    last_login =  Loginlog.objects.all().order_by('-date')[:10]
+
+    # user agent type stastics
+    data = {}
+    brower_title, brower_data = [], []
+    for v in views:
+        data[v.agent] = data.get(v.agent, 0) + 1
+    for k,v in data.items():
+        tmp = {}
+        tmp['name'] = k
+        tmp['value'] = v
+        brower_data.append(tmp)
+        brower_title.append(k)
+    brower_data, brower_title = json.dumps(brower_data), json.dumps(brower_title)
+
     return render_to_response('admin/admin_index.html', locals(), context_instance=RequestContext(request))
 
 
@@ -162,19 +263,21 @@ def category_edit_inline(request):
 
 
 def category_del(request):
-    if request.method == "GET":
-        cid = request.GET.get('id', '')
-        c = getObject(Category, id=cid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            papers = Paper.objects.filter(cid=cid)
-            for p in papers:
-                p.delete()
-            c.delete()
+            for k in fid:
+                f = getObject(Viewlog, id=k)
+                papers = Paper.objects.filter(cid=f.id)
+                for p in papers:
+                    p.delete()
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
@@ -208,40 +311,50 @@ def paper_add(request):
         category = getObject(Category, id=cid)
         category.paper_total += 1
         category.save()
-
-        # send mail
-        if int(request.POST.get('secrete')) == 0 and int(request.POST.get('status')) == 1:
-            users = Users.objects.all()
-            recivers = []
-            for u in users:
-                recivers.append(u.email)
-            p = getObject(Paper, title=data['title'])
-            if p:
-                pid = p.id
-            else:
-                pid = 1
-            mail = getObject(Emailsetting, status=1)
-            config = Config.objects.all()
-            if config:
-                message_header = config[0].title
-            else:
-                message_header = WEB_TITLE
-            mail_message = u"""
-            <p> 快来围观！ </p>
-            <p> 有新文章发布了！<br>
-                %s... </p>
-            <a href="%s/blog/paper_detail/?pid=%s"> %s </a>
-            """ % (data.get('content')[:50], WEB_URL, pid, data.get('title'))
-            message = MIMEText(mail_message, 'html', 'utf-8')
-            message['From'] = Header(message_header, 'utf-8')
-            message['To'] = '求围观'
-            subject = '有新文章发布~'
-            message['Subject'] = Header(subject, 'utf-8')
-            send_mail(mail, recivers, message.as_string())
-
         return HttpResponseRedirect(reverse('paper_list'))
     cate = Category.objects.all()
     return render_to_response('admin/paper/paper_add.html', locals(), context_instance=RequestContext(request))
+
+
+def paper_push(request):
+    if request.method == "POST":
+        pid = request.POST.get('id', '')
+        paper = getObject(Paper, id=pid)
+        # send mail
+        try:
+            if paper.secrete == 0 and paper.status == 1:
+                users = Users.objects.all()
+                recivers = []
+                for u in users:
+                    recivers.append(u.email)
+                mail = getObject(Emailsetting, status=1)
+                config = Config.objects.all()
+                if config:
+                    message_header = config[0].title
+                else:
+                    message_header = WEB_TITLE
+                mail_message = u"""<p> 快来围观！ </p><p> 有新文章发布了！<br>%s... </p><a href="%s/blog/paper_detail/?pid=%s"> %s </a>""" % (paper.content[:50], WEB_URL, pid, paper.title)
+                message = MIMEText(mail_message, 'html', 'utf-8')
+                message['From'] = Header(message_header, 'utf-8')
+                message['To'] = '求围观'
+                subject = '有新文章发布~'
+                message['Subject'] = Header(subject, 'utf-8')
+                send_mail(mail, recivers, message.as_string())
+                status = 1
+                info = '推送成功'
+            elif paper.secrete == 1:
+                info = '文章为隐私状态, 无法推送'
+                status = 0
+            elif paper.status == 0:
+                info = '文章暂停使用, 无法推送'
+                status = 0
+        except Exception as e:
+            status = 0
+            info = str(e)
+        return HttpResponse(json.dumps({
+                    "status": status,
+                    "info": info
+                })) 
 
 
 def paper_edit(request):
@@ -307,24 +420,25 @@ def paper_edit_inline(request):
 
 
 def paper_del(request):
-    if request.method == "GET":
-        pid = request.GET.get('id', '')
-        p = getObject(Paper, id=pid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            category = getObject(Category, id=p.cid)
-            category.paper_total -= 1
-            category.save()
-            p.delete()
+            for k in fid:
+                f = getObject(Paper, id=k)
+                category = getObject(Category, id=f.cid)
+                category.paper_total -= 1
+                category.save()
+                f.delete()
             status = 1
-            info = 'delete success!'
-        except:
+            info = 'delete successful!'
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
                 })) 
-
 
 
 def email_setting(request):
@@ -410,16 +524,18 @@ def email_edit_inline(request):
 
 
 def email_del(request):
-    if request.method == "GET":
-        eid = request.GET.get('id', '')
-        e = getObject(Emailsetting, id=eid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            e.delete()
+            for k in fid:
+                f = getObject(Emailsetting, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
@@ -616,21 +732,22 @@ def user_edit_inline(request):
 
 
 def user_del(request):
-    if request.method == "GET":
-        uid = request.GET.get('id', '')
-        u = getObject(Users, id=uid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            u.delete()
+            for k in fid:
+                f = getObject(Users, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
                 })) 
-
 
 def paper_comment_list(request):
     find = Comment.objects.all()
@@ -697,21 +814,22 @@ def comment_edit_inline(request):
 
 
 def comment_del(request):
-    if request.method == "GET":
-        cid = request.GET.get('id', '')
-        c = getObject(Comment, id=cid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            c.delete()
+            for k in fid:
+                f = getObject(Comment, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
                 })) 
-
 
 def blog_message_list(request):
     pass
@@ -797,22 +915,22 @@ def file_edit_inline(request):
 
 
 def web_file_del(request):
-    if request.method == "GET":
-        fid = request.GET.get('id', '')
-        f = getObject(UpFiles, id=fid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            f.delete()
-            file_delete(file)
+            for k in fid:
+                f = getObject(UpFiles, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
                 })) 
-
 
 def login_log_list(request):
     find = Loginlog.objects.all()
@@ -820,22 +938,23 @@ def login_log_list(request):
     return render_to_response('admin/webmaster/login_log_list.html', locals(), context_instance=RequestContext(request))
 
 
-def login_del(request):
-    if request.method == "GET":
-        fid = request.GET.get('id', '')
-        f = getObject(Loginlog, id=fid)
+def login_del(request):  
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            f.delete()
+            for k in fid:
+                f = getObject(Loginlog, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
-                }))  
-
+                })) 
 
 def view_log_list(request):
     find = Viewlog.objects.all()
@@ -849,20 +968,22 @@ def view_log_list(request):
 
 
 def view_log_del(request):
-    if request.method == "GET":
-        fid = request.GET.get('id', '')
-        f = getObject(Viewlog, id=fid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            f.delete()
+            for k in fid:
+                f = getObject(Viewlog, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
-                }))  
+                })) 
 
 
 def blogroll_list(request):
@@ -947,20 +1068,23 @@ def blogroll_edit_inline(request):
 
 
 def blogroll_del(request):
-    if request.method == "GET":
-        fid = request.GET.get('id', '')
-        f = getObject(Blogroll, id=fid)
+    if request.method == "POST":
+        fid = request.POST.get('id', '')
+        fid = fid.split(',')
         try:
-            f.delete()
+            for k in fid:
+                f = getObject(Blogroll, id=k)
+                f.delete()
             status = 1
             info = 'delete successful!'
-        except:
+        except Exception as e:
             status = 0
-            info = 'fail'
+            info = str(e)
         return HttpResponse(json.dumps({
                     "status": status,
                     "info": info
-                }))  
+                })) 
+
 
 def database_list(request):
     files = UpFiles.objects.filter(typeid=2)
@@ -1012,3 +1136,5 @@ def database_recover(request):
                     "status": status,
                     "info": info
                 })) 
+
+

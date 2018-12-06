@@ -26,6 +26,7 @@
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
                                     <a class="btn btn-primary btn-sm" href="{% url 'paper_add' %}"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'paper_del' %}" ><i class="fa fa-trash"></i>删除</a>
                                 </div>
                             </div>
                             <div class="box-body table-responsive">
@@ -70,10 +71,13 @@
                                         <td>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_detail' %}?pid={{ p.id }}" target="_blank"><i class="fa fa-eye"></i>查看</a>
                                             <a class="btn btn-primary btn-xs" href="{% url 'paper_edit' %}?pid={{ p.id }}"><i class="fa fa-edit"></i> 编辑</a> 
+                                            <a href="javascript:void(0);" data-id="{{ p.id }}" data-field="0" 
+                                            data-value="0" data-url="{% url 'paper_push' %}" data-title="推送" data-content="确认将该文章推送至用户邮箱" class="edit_inline btn btn-primary btn-xs" 
+                                            ><i class=" fa fa-paper-plane"></i>推送</a>
 
                                             <a href="javascript:void(0);" data-id="{{ p.id }}"  
                                             data-url="{% url 'paper_del' %}"
-                                            class="btn btn-xs btn-danger file_del">删除</a>
+                                            class="btn btn-xs btn-danger delete-one">删除</a>
 
                                         </td>
                                     </tr>
@@ -93,42 +97,6 @@
         </div>
         {% include 'admin/public/load_foot.html' %}
     </div>
-<!-- <script>
-    $(document).ready(function(){
-        $('.file_del').click(function(){
-            var row = $(this).closest('tr');
-            if (confirm("确定删除")) {
-            $.get(
-                    $(this).attr('value'),
-                    {},
-                    function(data){
-                        row.remove();
-                        alert(data);
-                    }
-            )}
-        });
-    });
-
-    $(function(){
-    $('.editable').editable({
-        emptytext: "empty",
-        params: function(params){
-            var data = {};
-            data['id'] = params.pk
-            data['name'] = params.value
-            return data;
-        },
-        success: function(response, newValue){
-            var res = $.parseJSON(response);
-            if (res.status == 1) {
-
-            }else{
-                return res.info;
-            }
-        }
-    });
-});
-</script> -->
     {% include 'admin/public/load_bottom.html' %}
 </body>
 </html>

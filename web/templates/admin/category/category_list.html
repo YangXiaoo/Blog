@@ -26,6 +26,7 @@
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
                                     <a class="btn btn-primary btn-sm" href="{% url 'category_add' %}"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'category_del' %}" ><i class="fa fa-trash"></i>删除</a>
                                 </div>
                             </div>
                             <div class="box-body table-responsive">
@@ -73,7 +74,7 @@
                                             {% endifequal %}
                                             <a href="javascript:void(0);" data-id="{{ c.id }}"  
                                             data-url="{% url 'category_del' %}"
-                                            class="btn btn-xs btn-danger file_del">删除</a>
+                                            class="btn btn-xs btn-danger delete-one">删除</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

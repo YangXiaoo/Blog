@@ -164,3 +164,47 @@ def send_mail(email, address, content):
         return True
     except Exception as e:
         return False
+
+
+
+def get_client_type(agent):
+    """
+    判断用户端类型
+    返回0：移动端
+    返回1：PC端
+    """
+    pc_types = {
+        'Opera' : 'Opera浏览器',
+        'Firefox' : '火狐浏览器',
+        'TaoBrowser':'淘宝浏览器',
+        'LBBROWSER':'猎豹浏览器',
+        'QQBrowser':'QQ浏览器', 
+        'MetaSr':'搜狗浏览器',
+        'Maxthon':'遨游浏览器', 
+        'UBrowser':'UC浏览器',
+        'Opera':'Opera',
+        'Chrome':'谷歌浏览器',
+        'Safari':'Safari'
+        }
+    mobile_type = {
+        'iPad':'IPAD',
+        'iPod' : 'iPod',
+        'iPhone':'iPhone',
+        'Android':'Android',
+        'BlackBerry' : 'BlackBerry移动端',
+        'hp-tablet':'WebOS HP Touchpad移动端',
+        'MQQBrowser' : 'QQ浏览器移动端',
+        'Presto' : 'Android Opera Mobile移动端',
+        'Xoom' : 'Android Pad Moto Xoom移动端',
+        'Windows Phone' : 'Windows Phone Mango移动端',
+        'UCWEB' : 'UC移动端',
+        'SogouMobileBrowser' : '搜狗移动端',
+        '360SE' : '360移动端'
+          }
+    for k, v in pc_types.items():
+        if k in agent:
+            return 1,v
+    for k, v in dict.items():
+        if k in agent:
+            return 0,v
+    return '', ''

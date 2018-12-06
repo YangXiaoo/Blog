@@ -31,6 +31,7 @@ class Users(models.Model):
     user_info = models.CharField(max_length = 500, null=True)
     last_login =  models.DateField(auto_now=True, null=True)
     last_ip = models.CharField(max_length = 20, null=True)
+    agent = models.CharField(max_length = 20, null=True)
 
     def __unicode__(self):
         return self.username
@@ -86,3 +87,4 @@ class Comment(models.Model):
     status = models.IntegerField(default = 1, null=True)
     like = models.IntegerField(default = 0, null=True)
     dislike = models.IntegerField(default = 0, null=True)
+    agent = models.CharField(max_length = 20, null=True)

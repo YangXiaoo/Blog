@@ -22,12 +22,13 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="box box-primary">
-<!--                             <div class="box-header with-border">
+                            <div class="box-header with-border">
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
-                                    <a class="btn btn-primary btn-sm" href="#"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'view_log_del' %}" ><i class="fa fa-trash"></i>删除</a> 
                                 </div>
-                            </div> -->
+                            </div>
+                            
                             <div class="box-body table-responsive">
                                 <table class="table table-bordered table-hover table-sort">
                                     <tr>
@@ -48,11 +49,11 @@
                                         <td>   
                                             <a href="{% url 'paper_detail' %}?pid={{ v.pid }}" target="_blank">{{ v.pid|paper:'title' }}</a>
                                         </td>
-                                        <td>{{ v.data }}</td>
+                                        <td>{{ v.date }}</td>
                                         <td>
                                             <a href="javascript:void(0);" data-id="{{ v.id }}"  
                                             data-url="{% url 'view_log_del' %}"
-                                            class="btn btn-xs btn-danger file_del">删除</a>
+                                            class="btn btn-xs btn-danger delete-one">删除</a>
 
                                         </td>
                                     </tr>

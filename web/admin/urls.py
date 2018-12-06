@@ -20,6 +20,7 @@ urlpatterns = patterns('admin.views',
     url(r'^paper_edit$', 'paper_edit', name='paper_edit'),
     url(r'^paper_edit_inline$', 'paper_edit_inline', name='paper_edit_inline'),
     url(r'^paper_del$', 'paper_del', name='paper_del'),
+    url(r'^paper_push$', 'paper_push', name='paper_push'),
     url(r'^admin_markdown_upload_image$', 'admin_markdown_upload_image', name='admin_markdown_upload_image'),
 
     # user management

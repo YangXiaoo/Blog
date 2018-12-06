@@ -26,6 +26,7 @@
                                 <h3 class="box-title"></h3>
                                 <div class="pull-left">
                                     <a class="btn btn-primary btn-sm" href="#"> <i class="fa fa-save"></i> 新增</a> 
+                                    <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'web_file_del' %}" ><i class="fa fa-trash"></i>删除</a>
                                 </div>
                             
                                 <div class=" pull-right" style="top:10px;">
@@ -75,7 +76,7 @@
                                         <td>
                                             <a href="javascript:void(0);" data-id="{{ f.id }}"  
                                             data-url="{% url 'web_file_del' %}"
-                                            class="btn btn-xs btn-danger file_del">删除</a>
+                                            class="btn btn-xs btn-danger delete-one">删除</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

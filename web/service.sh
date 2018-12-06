@@ -30,7 +30,6 @@ start() {
         echo -n "myweb is running..."
         success "$myweb_start"
     else
-        # daemon python $myweb_dir/manage.py crontab add &>> /var/log/ssh.log 2>&1 #add crontab
         nginx -s stop &> /dev/null 2>&1 &
         service httpd stop &> /dev/null 2>&1 &
         pkill php-fpm &> /dev/null 2>&1 &
@@ -57,7 +56,6 @@ start() {
 
 stop() {
     echo -n $"Stopping ${PROC_NAME} service:"
-    # daemon python $sshserver_dir/manage.py crontab remove &>> /var/log/ssh.log 2>&1
     ps aux | grep -E 'run_server.py' | grep -v grep | awk '{print $2}' | xargs kill -9 &> /dev/null
     ret=$?
     if [ $ret -eq 0 ]; then

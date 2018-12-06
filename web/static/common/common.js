@@ -80,23 +80,27 @@ $(function(){
     });
 
 
-    // 删除文章，类
-    $('body').off('click', '.file_del');
-    $('body').on('click', '.file_del', function(event){
+    // ajax处理数据
+    $('body').off('click', '.edit_inline');
+    $('body').on('click', '.edit_inline', function(event){
         var _this = $(this);
         var row = _this.closest('tr');
         var id = _this.data('id');
+        var field = _this.data('field');
+        var value = _this.data('value');
         var url = _this.data('url');
-        var dataStr = jQuery.parseJSON( '{"id":"'+id+'"}' );
+        var title = _this.data('title');
+        var content = _this.data('content');
+        var dataStr = jQuery.parseJSON( '{"id":"'+id+'","'+field+'":"'+value+'"}' );
         BootstrapDialog.confirm({
-            title: "确认删除",
-            message: '删除该模块',
+            title: title,
+            message: content,
             btnCancelLabel: '取消',
             btnOKLabel: '确定',
             callback: function(result) {
                 if(result) {
                     $.ajax({
-                        type : "get",
+                        type : "post",
                         url : url,
                         dataType : 'json',
                         data : dataStr,
@@ -190,6 +194,20 @@ $(function(){
     });
 
 
+    // select all
+    $('.checkbox-toggle').on('ifChecked', function(event){
+        var _this = $(this);
+        var _table = _this.closest('.table');
+        _table.find("tr td input[type='checkbox']").iCheck("check");
+    });
+    $('.checkbox-toggle').on('ifUnchecked', function(event){
+        var _this = $(this);
+        var _table = _this.closest('.table');
+        _table.find("tr td input[type='checkbox']").iCheck("uncheck");
+    });
+
+
+
    $('body').off('click', '.up-btn');
     $('body').on("click", '.up-btn', function(event){
         var _this_up_btn = $(this); 
@@ -241,6 +259,69 @@ $(function(){
             form.ajaxSubmit(ajax_option);
         }
     });
+
+
+    $('body').off('click', '.delete-one,.delete-all');
+    $('body').on("click", '.delete-one,.delete-all', function(event){
+        event.preventDefault();
+        var _this = $(this);
+        var title = _this.data('title')?_this.data('title'):'删除';
+        var url_del = _this.data('url')||'';
+        var message = _this.data('message')?_this.data('message'):'确认操作？';
+        if(_this.hasClass('delete-all')){   //批量删除
+            var id = '';
+            var str = '';
+            var table_box = _this.closest('.box-header').next('.box-body').find(".table tr td input[name='id[]']");
+            $(table_box).each(function(){
+                if(true == $(this).is(':checked')){
+                    str += $(this).val() + ",";
+                }
+            });
+            if(str.substr(str.length-1)== ','){
+                id = str.substr(0, str.length-1);
+            }
+        }else{                              //单条删除
+            var id = _this.data('id')||'';
+        }
+        if(id && url_del){
+            BootstrapDialog.confirm({
+                onshow:function(obj){
+                    var cssConf = {};
+                    cssConf['width']=300;
+                    if(cssConf){
+                        obj.getModal().find('div.modal-dialog').css(cssConf);
+                    }
+                },
+                title: title,
+                message: message,
+                btnCancelLabel: '取消',
+                btnOKLabel: '确定',
+                callback: function(resultDel) {
+                    if(resultDel === true) {
+                        $.ajax({
+                            type : "post",
+                            url : url_del,
+                            dataType : 'json',
+                            data : { id:id, },
+                            success : function(data) {
+                                if(data.status == '1'){
+                                    $.amaran({'message':data.info});
+                                    $(table_box).each(function(){
+                                        if(true == $(this).is(':checked')){
+                                            $(this).closest('tr').remove();
+                                        }
+                                    });
+                                }else{
+                                    $.amaran({'message':data.info});
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+
 
 
 

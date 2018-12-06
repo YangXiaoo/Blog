@@ -46,11 +46,7 @@ def hot_paper(par,nums):
 @register.filter
 def paper_list(par,uid=None):
     if uid:
-        user = getObject(Users, id=int(uid))
-        if user.is_admin == 1:
-            p = Paper.objects.filter(cid=int(par))
-        else:
-            p = Paper.objects.filter(Q(cid=int(par))&Q(secrete=0))
+        p = Paper.objects.filter(cid=int(par))
     else:
         p = Paper.objects.filter(Q(cid=int(par))&Q(secrete=0))
     return p
@@ -83,6 +79,8 @@ def user_info(uid,par):
             return user.profile
         elif par == 'username':
             return user.username
+        elif par == 'admin':
+            return user.is_admin
         else:
             return 'error request'
     return 'None'

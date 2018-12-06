@@ -14,7 +14,7 @@ from myweb.settings import *
 
 
 from admin.models import *
-from admin.api import require_login,send_mail
+from admin.api import require_login,send_mail, get_client_type
 
 from email.mime.text import MIMEText
 from email.header import Header
@@ -36,20 +36,22 @@ def login(request):
                     request.session['role_id'] = 1
                 request.session['user_id'] = user.id
                 request.session.set_expiry(3600)
-                response= HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))
+                response= HttpResponseRedirect(reverse('blog_index'))
                 response.set_cookie('profile',user.profile)
                 response.set_cookie('username',user.username)
                 response.set_cookie('uid', user.id)
                 ip = get_client_ip(request)
                 user.last_ip = ip 
                 user.log_total += 1
-                try:
-                    ret = get_area(ip)
-                    if ret.get('status') == 'success':
-                        login_log = Loginlog(uid=user.id, name=user.username, ip=ip, province=ret.get('regionName'),city=ret.get('city'),isp=ret.get('isp'), lon=ret.get('lon'), lat=ret.get('lat'))
-                        login_log.save()
-                except:
-                    pass
+                # try:
+                agent = request.META.get('HTTP_USER_AGENT','')
+                _, agent = get_client_type(agent)
+                ret = get_area(ip)
+                if ret.get('status', 1) == 0:
+                    login_log = Loginlog(uid=user.id, name=user.username, ip=ip, province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'],district=ret['content']['address_detail']['district'],lon=ret['content']['point']['x'], lat=ret['content']['point']['y'], agent=agent)
+                    login_log.save()
+                # except:
+                #     pass
                 user.save()
                 return response
             else:
@@ -66,12 +68,15 @@ def logout(request):
     '''
     注销
     '''
-    del request.session['user_id']
-    del request.session['role_id']
     response = HttpResponseRedirect(reverse('blog_index'))
-    response.delete_cookie('uid')
-    response.delete_cookie('username')
-    response.delete_cookie('profile')
+    try:
+        del request.session['user_id']
+        del request.session['role_id']
+        response.delete_cookie('uid')
+        response.delete_cookie('username')
+        response.delete_cookie('profile')
+    except:
+        pass
     return response
 
 
@@ -106,10 +111,12 @@ def sign(request):
             return render_to_response('blog/sign.html',{'error':error})
 
         try:
+            agent = request.META.get('HTTP_USER_AGENT','')
+            _,agent = get_client_type(agent)
             user = getObject(Users,username=username)
             ret = get_area(ip)
-            if ret[status] == 'success':
-                login_log = Loginlog(uid=user.id, name=user.username, ip=ip,province=ret.get('regionName'),city=ret.get('city'),isp=ret.get('isp'), lon=ret.get('lon'), lat=ret.get('lat'))
+            if ret.get('status', 1) == 0:
+                login_log = Loginlog(uid=user.id, name=user.username, ip=ip,province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'],district=ret['content']['address_detail']['district'],lon=ret['content']['point']['x'], lat=ret['content']['point']['y'],agent=agent)
                 login_log.save()
         except:
             pass
@@ -220,10 +227,14 @@ def paper_detail(request):
         ip = get_client_ip(request)
         try:
             uid = request.COOKIES.get('uid',-1)
-            # ret = get_area(ip)
-            # if ret.get('status') == 'success':
-            view_log = Viewlog(uid=uid, ip=ip, pid=pid)
-            view_log.save()
+            view_log = Viewlog.objects.filter(Q(uid=uid)&Q(ip=ip)&Q(pid=pid))
+            if not view_log:
+                ret = get_area(ip)
+                agent = request.META.get('HTTP_USER_AGENT','')
+                _,agent = get_client_type(agent)
+                if ret.get('status', 1) == 0:
+                    view_log = Viewlog(uid=uid, ip=ip, pid=pid,lon=ret['content']['point']['x'], lat=ret['content']['point']['y'], agent=agent, province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'])
+                    view_log.save()
         except:
             pass
         comments = Comment.objects.filter(Q(pid=pid)&Q(pcid=-1)&Q(status=1))[:10]
@@ -267,8 +278,7 @@ def paper_detail(request):
                     if user_login:
                         ret += """<div class=""><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btnpull-right"><i class="fa fa-mail-reply "></i>回复</a></div>""" % (r.uid, c.id)
                     ret += "</div>"
-                ret += "</div>"
-        ret += "</div>" + "</div>"
+            ret += "</div>" + "</div>"
 
         status = [1, 0][len(comments) == 0]
         return HttpResponse(json.dumps({
@@ -293,7 +303,7 @@ def blog_search(request):
         k = request.GET.get('k', '')
         if request.session.get('role_id', '') == 0:
             papers = Paper.objects.filter(
-                Q(status=1)|
+                Q(status=1)&
                 Q(title__contains=k)|
                 Q(keywords__contains=k)|
                 Q(description__contains=k)|
@@ -302,8 +312,8 @@ def blog_search(request):
                 )
         else:
             papers = Paper.objects.filter(
-                Q(status=1)|
-                Q(secrete=0)|
+                Q(status=1)&
+                Q(secrete=0)&
                 Q(title__contains=k)|
                 Q(keywords__contains=k)|
                 Q(description__contains=k)|
@@ -311,10 +321,11 @@ def blog_search(request):
                 Q(content__contains=k)
                 )
         for p in papers:
-            p.title = p.title.replace(k, u'<b><i class="font-red">' + str(k) + '</i></b>')
-            p.description = p.description.replace(k, u'<b><i class="font-red">' + str(k) + '</i></b>')
+            p.title = p.title.replace(k, u'<b><i class="font-red">' + k + u'</i></b>')
+            p.description = p.description.replace(k, u'<b><i class="font-red">' + k + u'</i></b>')
         total = len(papers)
         return render_to_response('blog/search.html', locals(), context_instance=RequestContext(request))
+
 
 def blog_thumbs(request):
     if request.method == "GET":
@@ -324,13 +335,24 @@ def blog_thumbs(request):
         uid = request.COOKIES.get('uid', -1)
         ip = get_client_ip(request)
         if int(kind) == 0:
-            thumb = Thumbs(uid=uid, ip=ip, pid=pid, is_dislike=1)
-            paper.dislike += 1
-            info = "emmmmmmmmmmm...."
+            thumb = Thumbs.objects.filter(Q(pid=pid)&Q(uid=uid)&Q(ip=ip)&Q(is_dislike=1))
+            if thumb:
+                info = "为什么要点两次...."
+            else:
+                agent = request.META.get('HTTP_USER_AGENT','')
+                _,agent = get_client_type(agent)
+                thumb = Thumbs(uid=uid, ip=ip, pid=pid, is_dislike=1, agent=agent)
+                paper.dislike += 1
+                info = "emmmmmmmmmmm...."
         else:
-            thumb = Thumbs(uid=uid, ip=ip, pid=pid)
-            paper.like += 1
-            info = "谢谢你的支持"
+            thumb = Thumbs.objects.filter(Q(pid=pid)&Q(ip=ip)&Q(uid=uid)&Q(is_dislike=0))
+            if thumb:
+                info = '赞一次就吼了'
+            else:    
+                agent = request.META.get('HTTP_USER_AGENT','')
+                thumb = Thumbs(uid=uid, ip=ip, pid=pid, agent=agent)
+                paper.like += 1
+                info = "谢谢你的支持"
         try:
             thumb.save()
             paper.save()
@@ -364,32 +386,32 @@ def paper_comment(request):
         ruser = getObject(Users, id=ruid)
         user = getObject(Users, id=uid)
         mail = getObject(Emailsetting, status=1)
+        if mail:
+            paper = getObject(Paper, id=pid)
+            paper.comment_total += 1
+            paper.save()
 
-        paper = getObject(Paper, id=pid)
-        paper.comment_total += 1
-        paper.save()
-
-        config = Config.objects.all()
-        if config:
-            message_header = config[0].title
-        else:
-            message_header = WEB_TITLE
-        mail_message = u"""
-        <p> %s 回复你了 </p>
-        <p> %s... </p>
-        点击查看<a href="%s/blog/paper_detail/?pid=%s"> %s </a>
-        """ % (user.username, content[:20], WEB_URL, pid, paper.title)
-        message = MIMEText(mail_message, 'html', 'utf-8')
-        message['From'] = Header(message_header, 'utf-8')
-        message['To'] = '评论回复'
-        subject = '评论回复'
-        message['Subject'] = Header(subject, 'utf-8')
-        reciver = []
-        if not ruser:
-            reciver.append(mail.user)
-        else:
-            reciver.append(ruser.email)
-        send_mail(mail, reciver, message.as_string())
+            config = Config.objects.all()
+            if config:
+                message_header = config[0].title
+            else:
+                message_header = WEB_TITLE
+            mail_message = u"""
+            <p> %s 回复你了 </p>
+            <p> %s... </p>
+            点击查看<a href="%s/blog/paper_detail/?pid=%s"> %s </a>
+            """ % (user.username, content[:20], WEB_URL, pid, paper.title)
+            message = MIMEText(mail_message, 'html', 'utf-8')
+            message['From'] = Header(message_header, 'utf-8')
+            message['To'] = '评论回复'
+            subject = '评论回复'
+            message['Subject'] = Header(subject, 'utf-8')
+            reciver = []
+            if not ruser:
+                reciver.append(mail.user)
+            else:
+                reciver.append(ruser.email)
+            send_mail(mail, reciver, message.as_string())
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))
 
 def reply(pid):
