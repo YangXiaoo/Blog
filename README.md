@@ -34,7 +34,7 @@
 - 2018-12-8基本功能完成
 
 #说明
--  模板来源于[苏晓信](http://www.sxxblog.com/ "苏晓信")，使用thinkphp
+-  前端模板来源于[苏晓信](http://www.sxxblog.com/ "苏晓信")，使用thinkphp
 - 本人qq: 1270009836
 
 
