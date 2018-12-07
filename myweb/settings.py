@@ -174,5 +174,5 @@ STATIC_URL = '/static/'
 
 # QQ login
 CLIENT_ID = 101532962
-CLIENT_KEY = 'afc16d31bde4adcea920fa145f534c0b'
+CLIENT_KEY = 'xxxxxxxx'
 REDIRECT_URL = 'http://www.lxa.kim/qqconnect'
