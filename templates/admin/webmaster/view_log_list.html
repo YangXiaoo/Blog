@@ -1,0 +1,68 @@
+{% extends 'admin/public/base.html' %}
+
+{% block content %}
+{% load common_func %}
+
+<div class="content-wrapper">
+<!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            文章浏览日志列表
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                        <div class="pull-left">
+                            <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'view_log_del' %}" ><i class="fa fa-trash"></i>删除</a> 
+                        </div>
+                    </div>
+                    
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-hover table-sort">
+                            <tr>
+                                <th width="35"><input type="checkbox" class="minimal checkbox-toggle"></th>
+                                <th>id</th>
+                                <th>IP</th>
+                                <th>用户名</th>
+                                <th>文章</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                            {% for v in views.object_list %}
+                            <tr>
+                                <td><input type="checkbox" name="id[]" value="{{ v.id }}" class="minimal"></td>
+                                <td>{{ v.id }}</td>
+                                <td>{{ v.ip }}</td>
+                                <td>{{ v.uid|user_info:'username' }}</td>
+                                <td>   
+                                    <a href="{% url 'paper_detail' %}?pid={{ v.pid }}" target="_blank">{{ v.pid|paper:'title' }}</a>
+                                </td>
+                                <td>{{ v.date }}</td>
+                                <td>
+                                    <a href="javascript:void(0);" data-id="{{ v.id }}"  
+                                    data-url="{% url 'view_log_del' %}"
+                                    class="btn btn-xs btn-danger delete-one">删除</a>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+
+                    </div>
+                    <div class="box-footer clearfix">
+                        {% include 'admin/public/paginator.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+{% endblock %}

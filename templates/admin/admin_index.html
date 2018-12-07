@@ -1,0 +1,440 @@
+
+{% include 'admin/public/load_top.html' %}
+
+
+<body class="hold-transition skin-blue sidebar-collapse sidebar-mini">
+    <div class="wrapper">
+
+        
+        {% include 'admin/public/load_header.html' %}
+        {% include 'admin/public/load_sidebar.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1>
+                    后台首页
+                </h1>
+            </section>
+
+            <section class="content">
+
+
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-aqua">
+                            <span class="info-box-icon"><i class="fa fa-bookmark-o"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">文章总数</span>
+                                <span class="info-box-number">{{ paper_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                          </div>
+                          <!-- /.info-box -->
+                    </div>
+
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-maroon">
+                            <span class="info-box-icon"><i class="fa fa-eye"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">文章浏览</span>
+                                <span class="info-box-number">{{ view_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                          </div>
+                          <!-- /.info-box -->
+                    </div>
+
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-teal">
+                            <span class="info-box-icon"><i class="fa fa-user"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">用户数量</span>
+                                <span class="info-box-number">{{ user_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                          </div>
+                          <!-- /.info-box -->
+                    </div>
+
+                        <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-green">
+                            <span class="info-box-icon"><i class="fa fa-thumbs-o-up"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Likes</span>
+                                <span class="info-box-number">{{ like_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                          <!-- /.info-box -->
+                    </div>
+                        <!-- /.col -->
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-yellow">
+                            <span class="info-box-icon"><i class="fa fa-thumbs-o-down"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Dislike</span>
+                                <span class="info-box-number">{{ dislike_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                          <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="info-box bg-red">
+                            <span class="info-box-icon"><i class="fa fa-comments-o"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Comments</span>
+                                <span class="info-box-number">{{ comments_total }}</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                          <!-- /.info-box -->
+                    </div>
+                        <!-- /.col -->
+                </div>
+                      <!-- /.row -->
+
+
+                <div class="row">
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">最近30天用户活跃统计</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="login-line" height="312"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">近30天文章浏览统计</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="paper-view-line" height="312"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">用户活跃地点统计</h3>
+                            </div>
+                            <div class="box-body">
+                                <div id="user-avtive-area" class="responsive" style="width: 800px;height:500px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">客户端</h3>
+                            </div>
+                            <div class="box-body">
+                                <canvas id="brower-pie" height="400" width="400"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-sm-6 col-xs-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">最新登录</h3>
+                            </div>
+                            <div class="box-body no-padding">
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>IP</th>
+                                        <th>位置</th>
+                                        <th>登录时间</th>
+                                    </tr>
+                                    {% for l in last_login %}
+                                    <tr>
+                                        <td><span class="label label-success">{{ l.ip }}</span></td>
+                                        <td>{{ l.province }}&nbsp;{{ l.city }}</td>
+                                        <td>{{ l.date }}</td>
+                                    </tr>
+                                    {% endfor %}
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+        <!-- /.content-wrapper -->
+
+
+        {% include 'admin/public/load_foot.html' %}
+    </div>
+    {% include 'admin/public/load_bottom.html' %}
+
+<script type="text/javascript">
+window.chartColors = {
+    red: 'rgb(255, 99, 132)',
+    orange: 'rgb(255, 159, 64)',
+    yellow: 'rgb(255, 205, 86)',
+    green: 'rgb(75, 192, 192)',
+    blue: 'rgb(54, 162, 235)',
+    purple: 'rgb(153, 102, 255)',
+    grey: 'rgb(201, 203, 207)'
+};
+var config = {
+    type: 'line',
+    data: {
+        labels: {{ login_line_x|safe }},
+        datasets: [{
+            label: '登录次数',
+            backgroundColor: window.chartColors.blue,
+            borderColor: window.chartColors.green,
+            data: {{ login_line_y|safe }},
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: '登录次数统计'
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        },
+        scales: {
+            xAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: '日期'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: '登录次数'
+                }
+            }]
+        }
+    }
+};
+
+var config2 = {
+    type: 'line',
+    data: {
+        labels: {{ paper_view_line_x|safe }},
+        datasets: [{
+            label: '浏览量',
+            backgroundColor: window.chartColors.blue,
+            borderColor: window.chartColors.red,
+            data: {{ paper_view_line_y|safe }},
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        title: {
+            display: true,
+            text: '文章浏览统计'
+        },
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        },
+        scales: {
+            xAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: '日期'
+                }
+            }],
+            yAxes: [{
+                display: true,
+                scaleLabel: {
+                    display: true,
+                    labelString: '浏览量'
+                }
+            }]
+        }
+    }
+};
+
+window.onload = function() {
+    var ctx = document.getElementById('login-line').getContext('2d');
+    window.myLine = new Chart(ctx, config);
+    var ctx = document.getElementById('paper-view-line').getContext('2d');
+    window.myLine2 = new Chart(ctx, config2);
+};
+</script>
+
+<script type="text/javascript">
+var dom = document.getElementById("user-avtive-area");
+var myChart = echarts.init(dom);
+var app = {};
+option = {
+    backgroundColor: '#404a59',
+    title: {
+        text: '用户活跃地点统计',
+        subtext: '历史所有',
+        sublink: 'http://www.lxa.kim',
+        x:'center',
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function (params) {
+            return params.name + ' : ' + params.value[2];
+        }
+    },
+    legend: {
+        orient: 'vertical',
+        y: 'bottom',
+        x:'right',
+        data:['浏览量'],
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    visualMap: {
+        min: 0,
+        max: {{ max_view }},
+        calculable: true,
+        color: ['#d94e5d','#eac736','#50a3ba'],
+        textStyle: {
+            color: '#fff'
+        }
+    },
+    geo: {
+        map: 'china',
+        label: {
+            emphasis: {
+                show: false
+            }
+        },
+        itemStyle: {
+            normal: {
+                areaColor: '#323c48',
+                borderColor: '#111'
+            },
+            emphasis: {
+                areaColor: '#2a333d'
+            }
+        }
+    },
+    series: [
+        {
+            name: '浏览量',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: {{ user_active_data|safe }},
+            symbolSize: 12,
+            label: {
+                normal: {
+                    show: false
+                },
+                emphasis: {
+                    show: false
+                }
+            },
+            itemStyle: {
+                emphasis: {
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }
+            }
+        }
+    ]
+}
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+</script> 
+
+
+
+<script type="text/javascript">
+var dom = document.getElementById("brower-pie");
+var myChart = echarts.init(dom);
+var brower_data = {{ brower_data|safe }};
+var brower_title = {{ brower_title|safe }};
+
+var app = {};
+option = null;
+option = {
+    title : {
+        text: '客户端类型',
+        subtext: '',
+        x:'center'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+    },
+    legend: {
+        orient: 'vertical',
+        left: 'left',
+        data: brower_title
+    },
+    series : [
+        {
+            name: '客户端',
+            type: 'pie',
+            radius : '55%',
+            center: ['50%', '60%'],
+            data: brower_data,
+            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ]
+};
+;
+if (option && typeof option === "object") {
+    myChart.setOption(option, true);
+}
+       </script>
+</body>
+</html>
+
+
+ 

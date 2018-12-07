@@ -1,0 +1,191 @@
+{% load common_func %}
+{% include 'blog/public/top.html' %}
+{% include 'blog/public/load_header.html' %}
+<div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title"><span>{{ p.category }}</span></h1>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-9 blog-main">
+
+            <div class="blog-post">
+                <h4 class="blog-post-title">{{ p.title }}</h4>
+                <small class="blog-post-meta text-left">  
+                    <i class="fa fa-clock-o" title="时间：{{ p.data|date:"Y-m-j" }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>&nbsp;
+                    <i class="fa fa-eye" title="浏览：{{ p.views }}" data-toggle="tooltip" > {{ p.views }}
+                    </i>&nbsp;
+                    <i class="fa  fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip">&nbsp;{{ p.comment_total }}
+                    </i>&nbsp;
+                    <i class="fa fa-leaf" title="文章来源：{{ p.source }}" data-toggle="tooltip">{{ p.source }}</i>
+                </small>
+                <hr>
+                <div id="wordsView">
+                    <textarea style="display:none;" name="editormd-markdown-doc">
+                        {{ p.content|safe }}
+                    </textarea>
+                </div>
+                <br><br>
+                <div class=" pull-left">
+                    <a class="bds_tsina fa fa-weibo" title="分享到新浪微博" data-toggle="tooltip" href="http://v.t.sina.com.cn/share/share.php?url=http://www.lxa.kim{{ request.get_full_path }}&title={{ p.title }}" target="_blank">
+                        
+                    </a>
+
+                    <a class="bds_qzone fa fa-star" title="分享到QQ空间" data-toggle="tooltip" href="http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=http://www.lxa.kim{{ request.get_full_path }}&showcount=1&desc=&summary={{ p.description }}&title={{ p.title }}" target="_blank" >
+                        
+                    </a>
+                    <a class="bds_sqq fa fa-qq" title="分享到QQ好友" data-toggle="tooltip" href="http://connect.qq.com/widget/shareqq/index.html?url=http://www.lxa.kim{{ request.get_full_path }}&desc=&title={{ p.title }}&summary={{ p.description }}" target="_blank">
+                        
+                    </a>
+                </div>
+                <div class="pull-right">
+                    <button class="btn dislike arc-thumbs" type="button" data-id="{{ p.id }}" data-kind="0" data-url="{% url 'blog_thumbs' %}" title="差评" data-toggle="tooltip" >
+                        <i class="fa fa-thumbs-o-down"></i>
+                        <span>{{ p.dislike }}</span>
+                    </button>    
+
+                    <button class="btn like arc-thumbs" type="button" data-id="{{ p.id }}" data-kind="1" data-url="{% url 'blog_thumbs' %}" title="点赞" data-toggle="tooltip" >
+                        <i class="fa fa-thumbs-o-up"></i>
+                        <span>{{ p.like }}</span>
+                    </button>  
+
+                </div>
+                <br>
+                <br>
+                <hr>
+                <div>
+                <br>
+                {{ preview_show|safe }}
+                </div>
+            </div>
+          <!-- /.blog-post -->
+          {% ifnotequal p.comment_total 0 %}
+            <div class="label label-info text-center">
+                共有&nbsp;{{ p.comment_total }}&nbsp;条评论
+            </div>
+            <div class="box-footer box-comments" style="background: #ffffff">
+                {% for  c in comments %}
+                <div class="box-comment">
+                    <img src="{{ c.uid|user_info:'profile' }}" alt="{{ c.uid|user_info:'profile' }}" class="img-circle img-md"">
+                    <div class="comment-text">            
+                        <span  class="username">
+                            <a href="#" target="_blank">{{ c.uid|user_info:'username' }}</a>
+
+                            <span class="text-muted pull-right"><i class="fa fa-clock-o"></i> {{ c.data|date:"Y-m-j"}}</span>   
+                        </span>
+                        {{ c.content|safe }}  
+
+                        {% ifnotequal request.COOKIES.uid None %}
+                        <br>
+                        <div class="">
+                            <a href="javascript:void(0);" data-ruid="{{ c.uid }}" data-pcid="{{ c.id }}" class="arc-btn pull-right">
+                                <i class="fa fa-mail-reply "></i>回复
+                            </a>
+                        </div>
+                        {% endifnotequal %}
+
+                        {% ifequal c.id|is_reply 1 %}
+                        <hr>
+                        {% endifequal %}
+
+                        {% for r in c.id|reply %}
+                        {% ifnotequal r 0 %}
+                        <div class="box-comment">
+                            <img src="{{ r.uid|user_info:'profile' }}" alt="{{ r.uid|user_info:'profile' }}"  class="img-circle img-md">
+                            <div class="comment-text"> 
+                                <span  class="username"> 
+                                    <a href="#" target="_blank">{{ r.uid|user_info:'username' }}</a>
+                                
+                                    <span class="text-muted pull-right">
+                                        <i class="fa fa-clock-o">{{ r.data|date:"Y-m-j"}}</i>
+                                    </span>
+                                </span>
+                                
+                                {% ifequal r.id|reply_user:c.uid 1 %}
+                                <a href="#" class="font-blue">
+                                    @{{ r.ruid|user_info:'username' }}
+                                </a>
+                                <br>
+                                {% endifequal %}
+
+                                {{ r.content|safe }}
+
+                            </div>
+
+                            {% ifnotequal request.COOKIES.uid None %}
+                            <div class="">
+                                <a href="javascript:void(0);" data-ruid="{{ r.uid }}" data-pcid="{{ c.id }}" class="arc-btn pull-right">
+                                    <i class="fa fa-mail-reply "></i>回复
+                                </a>
+                            </div>
+                            {% endifnotequal %}
+                        </div>
+                        {% endifnotequal %}
+                        {% endfor %}
+
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="new-load-box"></div>
+            </div>
+
+
+            <div class="x-mb-15">
+                <button class="btn btn-block" id="new-load-btn" data-page="2"
+        data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 加载中..." data-url="{% url 'paper_detail' %}" data-id="{{ p.id }}" style="background-color: #B4EEB4;">
+                    加载更多评论
+                </button>
+            </div>
+            {% endifnotequal %}
+            <br>
+
+
+            {% ifnotequal request.COOKIES.uid None %}
+            <div class="clearfix guestbook_box">
+                <form class="arc-form clearfix" method="POST" action="{% url 'paper_comment' %}" onsubmit="" >
+                    <input type="hidden" name="ruid" value="0" />
+                    <input type="hidden" name="pcid" value="-1" />
+                    <input type="hidden" name="pid" value="{{ p.id }}" />
+                    <input type="hidden" name="uid" value="{{ request.COOKIES.uid }}" />
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                        <img class="img-responsive img-circle img-sm" src="{{ request.COOKIES.profile }}" alt="Alt Text" height="30px" width="30px">
+                            <label for="gb_content">评论内容 <span class="text-red">*</span></label>
+                            <textarea class="form-control" id="gb_content" name="content" rows="3" style="resize:none;" placeholder="冲鸭！"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success pull-right submits" data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 提交">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div align="center" style="position: relative;z-index: 1">
+                请先<a href="{% url 'login' %}">登录</a>，再发表留言。
+            </div>
+            {% endifnotequal %}
+            <hr>
+        </div><!-- /.blog-main -->
+
+        <!-- sidebar -->
+        <div class="col-sm-2 col-sm-offset-1 blog-sidebar">
+            <div class="sidebar-module sidebar-module-inset alert alert-warning"  role="alert">
+                <h4>注意！</h4>
+                <p>著作版权归本网站所有，若有侵权，请联系。</p>
+            </div>
+
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-info" >文档分类</h4>{% include 'blog/public/cate.html' %}
+            </div><hr>
+            <div class="sidebar-module">
+                <h4 class="bs-callout bs-callout-danger">热门文章</h4>
+                {% include 'blog/public/hot.html' %}
+            </div><hr>
+        </div><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+{% include 'blog/public/bottom.html' %}

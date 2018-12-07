@@ -1,0 +1,83 @@
+{% extends 'admin/public/base.html' %}
+
+{% block content %}
+
+<div class="content-wrapper">
+<!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            数据库备份列表
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'admin_index' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                {% if error %}
+                <h1>
+                    <div class="alert alert-danger text-center">
+                        {{ error }}
+                    </div>
+                </h1>
+                {% endif %} 
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                        <div class="pull-left">
+                            <a class="btn btn-primary btn-sm" href="{% url 'database_backup' %}"> <i class="fa fa-save"></i>新增备份</a> 
+                            <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'web_file_del' %}" ><i class="fa fa-trash"></i>删除</a>
+                        </div>
+                    </div>
+
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-hover table-sort">
+                            <tr>
+                                <th width="35"><input type="checkbox" class="minimal checkbox-toggle"></th>
+                                <th>文件ID</th>
+                                <th>文件名</th>
+                                <th>大小</th>
+                                <th>上传时间</th>
+                                <th>操作</th>
+                            </tr>
+                            {% for f in files.object_list %}
+                            <tr>
+                                <td><input type="checkbox" name="id[]" value="{{ f.id }}" class="minimal"></td>
+                                <td>{{ f.id }}</td>
+                                <td>
+                                    <span class="editable" data-pk="{{ f.id  }}" data-name="{{ f.file_name  }}" data-url="{% url 'file_edit_inline' %}" >{{ f.file_name }}</span>
+                                </td>
+                                <td>
+                                    {{ f.size|filesizeformat }}
+                                </td>
+                                <td>{{ f.date_add }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'web_file' %}?download={{ f.file_path }}" target="_blank" class="alert-link">下载</a>
+
+                                    <a class="btn btn-primary btn-xs edit_inline" href="javascript:void(0);" data-url="{% url 'database_recover' %}" data-id="{{ f.id }}" data-title="还原" data-content="确认还原该数据"><i class="fa fa-rotate-left"></i> 还原</a>
+                                    
+                                    <a href="javascript:void(0);" data-id="{{ f.id }}"  
+                                    data-url="{% url 'web_file_del' %}"
+                                    class="btn btn-xs btn-danger delete-one">删除</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+
+                    </div>
+                    <div class="box-footer clearfix">
+                        {% include 'admin/public/paginator.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+{% endblock %}

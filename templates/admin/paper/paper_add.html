@@ -1,0 +1,48 @@
+{% extends 'admin/public/base.html' %}
+
+{% block content %}
+
+<div class="content-wrapper">
+<!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            新建文章
+        </h1>
+    </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="row">
+                <div class="col-md-12">
+                    <form class="form-horizontal" method="POST" action="" onsubmit="return true" >
+                        <input type="hidden" name="pid" value="{{ p.id }}" />
+                        
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab_base" data-toggle="tab">基本参数</a></li>
+                                <li><a href="#tab_advanced" data-toggle="tab">高级参数</a></li>
+                                <li class="pull-right"><a href="javascript:history.back(-1)" class="btn btn-sm" style="padding:10px 2px;"><i class="fa fa-list"></i> 返回</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                {% include 'admin/paper/base.html' %}                                
+                                {% include 'admin/paper/advance.html' %}
+                            </div>
+                            <div class="box-footer">
+                                <div class="col-sm-2"></div>
+                                <div class="col-sm-7">
+                                    <div class="btn-group pull-right">
+                                        <button type="submit" class="btn btn-info pull-right" data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 提交">提交</button>
+                                    </div>
+                                    <div class="btn-group pull-left">
+                                        <button type="reset" class="btn btn-warning">重置</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    <!-- /.content -->
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'admin/public/base.html' %}
+
+{% block content %}
+
+<div class="content-wrapper">
+<!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            友情链接列表
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                        <div class="pull-left">
+                            <a class="btn btn-primary btn-sm" href="{% url 'blogroll_add' %}"> <i class="fa fa-save"></i> 新增</a>
+                            <a class="btn btn-sm btn-danger delete-all" href="javascript:void(0);" data-url="{% url 'blogroll_del' %}" ><i class="fa fa-trash"></i>删除</a>  
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-hover table-sort">
+                            <tr>
+                                <th width="35"><input type="checkbox" class="minimal checkbox-toggle"></th>
+                                <th>id</th>
+                                <th>网站名称</th>
+                                <th>网站链接</th>
+                                <th>站长信息</th>
+                                <th>状态</th>
+                                <th>排序</th>
+                                <th>操作</th>
+                            </tr>
+                            {% for r in rolls.object_list %}
+                            <tr>
+                                <td><input type="checkbox" name="id[]" value="{{ r.id }}" class="minimal"></td>
+                                <td>{{ r.id }}</td>
+                                <td>
+                                    <span class="editable" data-pk="{{ r.id }}" data-name="{{ r.web_name }}" data-url="{% url 'blogroll_edit_inline' %}">{{ r.web_name }}</span>
+                                </td>
+                                <td>{{ r.web_link }}</td>
+                                <td>
+                                    {{ r.web_owner_email }}
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0);" data-id="{{ r.id }}" data-field="status" 
+                                    data-value="{{ r.status }}" data-url="{% url 'blogroll_edit_inline' %}"
+                                    class='editimg fa {% ifequal r.status 1 %}fa-check-circle text-green{% else %}fa-times-circle text-red{% endifequal %}'></a>
+                                </td>
+                                <td>{{ r.sorts }}</td>
+                                <td>
+                                    <a class="btn btn-primary btn-xs" href="{% url 'blogroll_edit' %}?id={{ r.id }}"><i class="fa fa-edit"></i> 编辑</a> 
+                                    <a href="javascript:void(0);" data-id="{{ r.id }}"  
+                                    data-url="{% url 'blogroll_del' %}"
+                                    class="btn btn-xs btn-danger delete-one">删除</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        
+                    </div>
+                    <div class="box-footer clearfix">
+                        {% include 'admin/public/paginator.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+{% endblock %}

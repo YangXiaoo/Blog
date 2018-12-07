@@ -1,0 +1,14 @@
+{% include 'admin/public/load_top.html' %}
+{% load common_func %}
+<body class="hold-transition skin-blue sidebar-collapse sidebar-mini">
+    <div class="wrapper">
+        {% include 'admin/public/load_header.html' %}
+        {% include 'admin/public/load_sidebar.html' %}
+
+        {% block content %}{% endblock %}
+        
+        {% include 'admin/public/load_foot.html' %}
+    </div>
+    {% include 'admin/public/load_bottom.html' %}
+</body>
+</html>
