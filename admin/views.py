@@ -950,7 +950,7 @@ def web_config(request):
     return render_to_response('admin/config/web_config.html', locals(), context_instance=RequestContext(request))
 
 
-
+@admin_require_login
 def web_file(request):
     set_view(request)
     files = UpFiles.objects.all()
