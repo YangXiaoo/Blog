@@ -201,7 +201,7 @@ def get_client_type(agent):
         'SogouMobileBrowser' : '搜狗移动端',
         '360SE' : '360移动端'
           }
-    for k, v in dict.items():
+    for k, v in mobile_type.items():
         if k in agent:
             return 0,v
     for k, v in pc_types.items():
