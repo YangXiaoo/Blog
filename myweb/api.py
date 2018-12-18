@@ -23,7 +23,7 @@ from myweb.models import Comment
 from myweb.settings import *
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myweb.settings'
-
+OLD_URL = ['www.lxa.kim', 'lxa.kim', 'www.lxxx.site', 'lxxx.site']
 
 
 def bash(cmd):
@@ -59,14 +59,21 @@ def getObject(model, **kwargs):
 def defendAttack(func):
     def _deco(request, *args, **kwargs):
         if int(request.session.get('visit', 1)) > 10:
-            logger.debug('请求次数: %s' % request.session.get('visit', 1))
             error = 'Forbidden(403),请求次数过多,请稍后再试。'
             return render_to_response('blog/error/404.html',{'error':error})
+        if request.META['HTTP_HOST'] in OLD_URL:
+            return render_to_response('old_url.html')
         request.session['visit'] = request.session.get('visit', 1) + 1
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
     return _deco
 
+def common(func):
+    def _deco(request, *args, **kwargs):
+        if request.META['HTTP_HOST'] in OLD_URL:
+            return render_to_response('old_url.html')
+        return func(request, *args, **kwargs)
+    return _deco
 
 def page_list_return(total, current=1):
     """

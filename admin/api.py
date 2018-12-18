@@ -22,7 +22,7 @@ from myweb.api import get_area
 from myweb.settings import *
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'myweb.settings'
-
+OLD_URL = ['www.lxa.kim', 'lxa.kim', 'www.lxxx.site', 'lxxx.site']
 
 def bash(cmd):
     '''
@@ -58,10 +58,14 @@ def defendAttack(func):
         if int(request.session.get('visit', 1)) > 50:
             Frobidden = '<h1>Forbidden.403.请求次数过多，请稍后再试。</h1>'
             return HttpResponse(Frobidden, status=403)
+        if request.META['HTTP_HOST'] in OLD_URL:
+            return render_to_response('old_url.html')
         request.session['visit'] = request.session.get('visit', 1) + 1
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
     return _deco
+
+
 
 
 def mkdir(dir_name, username='', mode=755):
@@ -124,6 +128,8 @@ def admin_require_login(func):
     用户验证
     """
     def _deco(request, *args, **kwargs):
+        if request.META['HTTP_HOST'] in OLD_URL:
+            return render_to_response('old_url.html')
         if request.session.get('role_id', '') != 0:
             return HttpResponseRedirect(reverse('admin_login'))
         else:

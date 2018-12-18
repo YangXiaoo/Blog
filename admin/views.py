@@ -26,7 +26,7 @@ from email.header import Header
 
 WEB_URL = 'http://yangxiao.online'
 WEB_TITLE = '杨潇-博客'
-
+OLD_URL = 'www.lxa.kim'
 
 @defendAttack
 def admin_login(request):
@@ -88,7 +88,7 @@ def admin_logout(request):
     return response
 
 
-
+@common
 def admin_index(request):
     '''
     主页
@@ -191,7 +191,7 @@ def admin_index(request):
     return render_to_response('admin/admin_index.html', locals(), context_instance=RequestContext(request))
 
 
-
+@common
 def category_list(request):
     """
     文章分类
@@ -296,7 +296,7 @@ def category_del(request):
                     "info": info
                 })) 
 
-
+@common
 def paper_list(request):
     set_view(request)
     papers_find = Paper.objects.all()
@@ -470,7 +470,7 @@ def paper_del(request):
                 })) 
 
 
-
+@common
 def email_setting(request):
     set_view(request)
     if EMAIL_HOST_PASSWORD:
@@ -674,7 +674,7 @@ def admin_upload_file(request):
             }))
 
 
-
+@common
 def user_list(request):
     set_view(request)
     user_find = Users.objects.all()
@@ -821,7 +821,7 @@ def user_del(request):
                     "info": info
                 })) 
 
-
+@common
 def paper_comment_list(request):
     set_view(request)
     find = Comment.objects.all()
@@ -915,7 +915,7 @@ def blog_message_list(request):
     pass
 
 
-
+@common
 def web_config(request):
     set_view(request)
     if request.method == 'POST':
@@ -1018,7 +1018,7 @@ def web_file_del(request):
                     "info": info
                 })) 
 
-
+@common
 def login_log_list(request):
     set_view(request)
     find = Loginlog.objects.all()
@@ -1045,7 +1045,7 @@ def login_del(request):
                     "info": info
                 })) 
 
-
+@common
 def view_log_list(request):
     set_view(request)
     find = Viewlog.objects.all()
@@ -1078,7 +1078,7 @@ def view_log_del(request):
                 })) 
 
 
-
+@common
 def blogroll_list(request):
     set_view(request)
     find = Blogroll.objects.all()
@@ -1183,7 +1183,7 @@ def blogroll_del(request):
                 })) 
 
 
-
+@common
 def database_list(request):
     set_view(request)
     files = UpFiles.objects.filter(typeid=2)

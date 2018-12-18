@@ -21,6 +21,7 @@ from email.header import Header
 
 WEB_URL = 'http://yangxiao.online'
 WEB_TITLE = '杨潇-博客'
+OLD_URL = ['www.lxa.kim', 'lxa.kim', 'www.lxxx.site', 'lxxx.site']
 
 @defendAttack
 def login(request):
@@ -115,6 +116,7 @@ def qq_login(request):
     return HttpResponseRedirect(url)
 
 
+@common
 def bind_account_qq(request):
     if request.method == "GET":
         open_id = request.GET.get('open_id', '')
@@ -182,7 +184,7 @@ def logout(request):
     return response
 
 
-
+@common
 def sign(request):
     error = ''
     if request.method == "POST":
@@ -237,7 +239,7 @@ def sign(request):
     return render_to_response('blog/sign.html')
 
 
-
+@common
 def blog_index(request):
     '''
     主页
@@ -270,7 +272,7 @@ def blog_index(request):
         papers = Paper.objects.filter(Q(status=1)&Q(secrete=0))[:10]
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
-
+@common
 def category_detail(request):
     if request.method == "GET":
         cid = request.GET.get('cid', '')
@@ -322,6 +324,7 @@ def category_detail(request):
     return render_to_response('blog/error/404.html',{'error':error})
 
 
+@common
 def paper_detail(request):
     if request.method == "GET":
         pid = request.GET.get('pid', '')
@@ -404,6 +407,7 @@ def paper_detail(request):
     return render_to_response('blog/error/404.html',{'error':error})
 
 
+@common
 def blog_category_list(request):
     if request.session.get('role_id', '') == 0:
         cate = Category.objects.filter(status=1)
@@ -415,6 +419,7 @@ def blog_category_list(request):
     return render_to_response('blog/category/blog_category_list.html', locals(), context_instance=RequestContext(request))
 
 
+@common
 def blog_search(request):
     if request.method == "GET":
         k = request.GET.get('k', '')
@@ -444,6 +449,7 @@ def blog_search(request):
         return render_to_response('blog/public/search.html', locals(), context_instance=RequestContext(request))
 
 
+@common
 def blog_thumbs(request):
     if request.method == "GET":
         pid = request.GET.get('id', '')
@@ -485,7 +491,7 @@ def blog_thumbs(request):
                 })) 
 
 
-
+@common
 def paper_comment(request):
     if request.method == "POST":
         ruid = request.POST.get('ruid', '')
@@ -533,11 +539,13 @@ def paper_comment(request):
             send_mail(mail, reciver, message.as_string())
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', reverse('blog_index')))
 
+@common
 def request_error(request):
     error = "emmmmm, URL地址错误"
     return render_to_response('blog/error/404.html',{'error':error})
 
 
+@common
 def preview(par,nums=None):
     par, nums = int(par), int(nums)
     paper = getObject(Paper, id=par)
@@ -560,3 +568,8 @@ def preview(par,nums=None):
     else:
         right_paper = u"""<span><i class="fa fa-exclamation"></i>到底了</span>"""
     return u"""<span class="pull-left">%s</span><span class="pull-right">%s</span>""" % (left_paper, right_paper)
+
+
+
+def old_url(request):
+    return render_to_response('old_url.html')

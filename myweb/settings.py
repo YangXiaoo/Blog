@@ -173,6 +173,6 @@ STATIC_URL = '/static/'
 # there can add cronjobs
 
 # QQ login
-CLIENT_ID = 101532962
-CLIENT_KEY = 'xxxxxxxx'
-REDIRECT_URL = 'http://www.lxa.kim/qqconnect'
+CLIENT_ID = 101536906
+CLIENT_KEY = 'e532c0b219544707866d3c4235edf5d5'
+REDIRECT_URL = 'http://yangxiao.online/qqconnect'

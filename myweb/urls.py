@@ -4,6 +4,8 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('myweb.views',
     url(r'^$', 'blog_index', name='blog_index'),
 
+    url(r'^old_url$', 'old_url', name='old_url'),
+
     url(r'^qqconnect$', 'qq_connect', name='qq_connect'),
     url(r'^qq_login$', 'qq_login', name='qq_login'),
     url(r'^bind_account_qq$', 'bind_account_qq', name='bind_account_qq'),
