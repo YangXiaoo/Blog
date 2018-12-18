@@ -24,7 +24,7 @@ from email.header import Header
 
 # import markdown
 
-WEB_URL = 'http://www.lxa.kim'
+WEB_URL = 'http://yangxiao.online'
 WEB_TITLE = '杨潇-博客'
 
 

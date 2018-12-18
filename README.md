@@ -1,6 +1,6 @@
 # Blog
-[首页链接](http://www.lxa.kim "首页链接")
-[后台首页](http://www.lxa.kim/admin/ "后台首页")
+[首页链接](http://yangxiao.online "首页链接")
+[后台首页](http://yangxiao.online/admin/ "后台首页")
 
 采用python2.7，django1.6
 

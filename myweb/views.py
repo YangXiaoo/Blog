@@ -19,7 +19,7 @@ from admin.api import require_login,send_mail, get_client_type
 from email.mime.text import MIMEText
 from email.header import Header
 
-WEB_URL = 'http://www.lxa.kim'
+WEB_URL = 'http://yangxiao.online'
 WEB_TITLE = '杨潇-博客'
 
 @defendAttack
