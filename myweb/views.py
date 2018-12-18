@@ -545,7 +545,6 @@ def request_error(request):
     return render_to_response('blog/error/404.html',{'error':error})
 
 
-@common
 def preview(par,nums=None):
     par, nums = int(par), int(nums)
     paper = getObject(Paper, id=par)
