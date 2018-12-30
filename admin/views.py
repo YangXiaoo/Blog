@@ -1,7 +1,7 @@
 # coding:UTF-8
 # 2018-11-28 - 2018-12- 
 import uuid 
-import time,datetime, os
+import time,datetime, os, random
 import json
 
 from django.db.models import Count
@@ -177,16 +177,17 @@ def admin_index(request):
 
     # user agent type stastics
     data = {}
-    brower_title, brower_data = [], []
+    brower_data_lables, brower_data, brower_background_color = [], [], []
     for v in views:
         data[v.agent] = data.get(v.agent, 0) + 1
     for k,v in data.items():
-        tmp = {}
-        tmp['name'] = k
-        tmp['value'] = v
-        brower_data.append(tmp)
-        brower_title.append(k)
-    brower_data, brower_title = json.dumps(brower_data), json.dumps(brower_title)
+        brower_data.append(v)
+        brower_data_lables.append([k, 'other'][k  == ''])
+        tmp_color = []
+        for i in range(3):
+            tmp_color.append(str(random.randint(0,255)))
+        brower_background_color.append('rgb(' + ','.join(tmp_color) + ')')
+    brower_data, brower_data_lables, brower_background_color = json.dumps(brower_data), json.dumps(brower_data_lables), json.dumps(brower_background_color)
 
     return render_to_response('admin/admin_index.html', locals(), context_instance=RequestContext(request))
 

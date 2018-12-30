@@ -213,7 +213,7 @@ def get_client_type(agent):
     for k, v in pc_types.items():
         if k in agent:
             return 1,v
-    return '', ''
+    return 'other', 'other'
 
 
 def set_view(request):

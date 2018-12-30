@@ -134,12 +134,12 @@
                     </div>
 
 
-                    <div class="col-lg-12 col-sm-12 col-xs-12">
+                    <div class="col-lg-12 col-sm-6 col-xs-12">
                         <div class="box box-primary">
                             <div class="box-header with-border">
                                 <h3 class="box-title">用户活跃地点统计</h3>
                             </div>
-                            <div class="box-body">
+                            <div class="box-body" class="responsive">
                                 <div id="user-avtive-area" class="responsive" style="width: 800px;height:500px;"></div>
                             </div>
                         </div>
@@ -152,7 +152,7 @@
                                 <h3 class="box-title">客户端</h3>
                             </div>
                             <div class="box-body">
-                                <canvas id="brower-pie" height="400" width="400"></canvas>
+                                <canvas id="brower-pie" height="312"></canvas>
                             </div>
                         </div>
                     </div>
@@ -293,11 +293,42 @@ var config2 = {
     }
 };
 
+var brower_data = {{ brower_data|safe }};
+var brower_data_lables = {{ brower_data_lables|safe }};
+var brower_background_color = {{ brower_background_color|safe }};
+var config3 = {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: brower_data,
+            backgroundColor: brower_background_color,
+            label: 'Dataset 1'
+        }],
+        labels: brower_data_lables
+    },
+    options: {
+        responsive: true,
+        legend: {
+            position: 'top',
+        },
+        title: {
+            display: true,
+            text: '客户端类型'
+        },
+        animation: {
+            animateScale: true,
+            animateRotate: true
+        }
+    }
+};
+
 window.onload = function() {
     var ctx = document.getElementById('login-line').getContext('2d');
     window.myLine = new Chart(ctx, config);
     var ctx = document.getElementById('paper-view-line').getContext('2d');
     window.myLine2 = new Chart(ctx, config2);
+    var ctx3 = document.getElementById("brower-pie").getContext('2d');
+    window.myDoughnut = new Chart(ctx3, config3);
 };
 </script>
 
@@ -310,7 +341,7 @@ option = {
     title: {
         text: '用户活跃地点统计',
         subtext: '历史所有',
-        sublink: 'http://www.lxa.kim',
+        sublink: 'http://yangxiao.online',
         x:'center',
         textStyle: {
             color: '#fff'
@@ -385,54 +416,6 @@ if (option && typeof option === "object") {
     myChart.setOption(option, true);
 }
 </script> 
-
-
-
-<script type="text/javascript">
-var dom = document.getElementById("brower-pie");
-var myChart = echarts.init(dom);
-var brower_data = {{ brower_data|safe }};
-var brower_title = {{ brower_title|safe }};
-
-var app = {};
-option = null;
-option = {
-    title : {
-        text: '客户端类型',
-        subtext: '',
-        x:'center'
-    },
-    tooltip : {
-        trigger: 'item',
-        formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    legend: {
-        orient: 'vertical',
-        left: 'left',
-        data: brower_title
-    },
-    series : [
-        {
-            name: '客户端',
-            type: 'pie',
-            radius : '55%',
-            center: ['50%', '60%'],
-            data: brower_data,
-            itemStyle: {
-                emphasis: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            }
-        }
-    ]
-};
-;
-if (option && typeof option === "object") {
-    myChart.setOption(option, true);
-}
-       </script>
 </body>
 </html>
 
