@@ -60,9 +60,11 @@
             </div>
           <!-- /.blog-post -->
           {% ifnotequal p.comment_total 0 %}
-            <div class="label label-info text-center">
+
+<!--             <div class="label label-info text-center">
                 共有&nbsp;{{ p.comment_total }}&nbsp;条评论
-            </div>
+            </div> -->
+            <br>
             <div class="box-footer box-comments" style="background: #ffffff">
                 {% for  c in comments %}
                 <div class="box-comment">
@@ -130,9 +132,9 @@
             </div>
 
 
-            <div class="x-mb-15">
+            <div class="x-mb-15" style="padding: 0px 0px 30px 0px;">
                 <button class="btn btn-block" id="new-load-btn" data-page="2"
-        data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 加载中..." data-url="{% url 'paper_detail' %}" data-id="{{ p.id }}" style="background-color: #B4EEB4;">
+        data-loading-text="&lt;i class='fa fa-spinner fa-spin '&gt;&lt;/i&gt; 加载中..." data-url="{% url 'paper_detail' %}" data-id="{{ p.id }}" >
                     加载更多评论
                 </button>
             </div>
