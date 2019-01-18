@@ -130,7 +130,7 @@ def get_client_ip(request):
 
 
 def get_area(ip):
-    ak =  'hGK861NGVlSbxiVnBHqF0lICUeiUBVhp' 
+    ak =  'hGK861' 
     url = 'https://api.map.baidu.com/location/ip?ip=%s&ak=%s&coor=bd09ll' % (str(ip), ak)
     urlobject = urllib2.urlopen(url)  
     urlcontent = urlobject.read()  

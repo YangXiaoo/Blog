@@ -269,7 +269,7 @@ def blog_index(request):
     if request.session.get('role_id', '') == 0:
         papers = Paper.objects.filter(status=1).order_by('-id')[:10]
     else:
-        papers = Paper.objects.filter(Q(status=1)&Q(secrete=0))[:10]
+        papers = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by('-id')[:10]
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
 @common
@@ -287,9 +287,9 @@ def category_detail(request):
                     return render_to_response('blog/login.html',{'error':error}) 
             category_name = cate.category_name
             if request.session.get('role_id', '') != 0:
-                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0))
+                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0)).order_by('-id')
             else:
-                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1))
+                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)).order_by('-id')
             return render_to_response('blog/category/category_detail.html', locals(), context_instance=RequestContext(request))
     elif request.method == "POST":
         cid = request.POST.get('id', '')
@@ -305,9 +305,9 @@ def category_detail(request):
                     error = '该内容需要登录才能查看'
                     return render_to_response('blog/login.html',{'error':error}) 
             if request.session.get('role_id', '') != 0:
-                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0))
+                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0)).order_by('-id')
             else:
-                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1))
+                papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)).order_by('-id')
             papers = papers[start : start + 10]
             ret = ''
             for p in papers:
@@ -473,7 +473,7 @@ def blog_thumbs(request):
             else:
                 thumb = Thumbs.objects.filter(Q(pid=pid)&Q(ip=ip)&Q(uid=uid)&Q(is_dislike=0))
                 if thumb:
-                    info = '赞一次就吼了'
+                    info = '赞一次就够了'
                 else:    
                     agent = request.META.get('HTTP_USER_AGENT','')
                     thumb = Thumbs(uid=uid, ip=ip, pid=pid, agent=agent)
@@ -541,7 +541,7 @@ def paper_comment(request):
 
 @common
 def request_error(request):
-    error = "emmmmm, URL地址错误"
+    error = "oops, URL地址错误"
     return render_to_response('blog/error/404.html',{'error':error})
 
 

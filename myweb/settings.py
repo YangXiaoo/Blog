@@ -174,5 +174,5 @@ STATIC_URL = '/static/'
 
 # QQ login
 CLIENT_ID = 101536906
-CLIENT_KEY = 'e532c0b219544707866d3c4235edf5d5'
+CLIENT_KEY = 'e532c0b219544705d5'
 REDIRECT_URL = 'http://yangxiao.online/qqconnect'
