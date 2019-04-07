@@ -1,4 +1,4 @@
-# Blog
+#Blog
 [首页链接](http://yangxiao.online "首页链接")
 [后台首页](http://yangxiao.online/admin/ "后台首页")
 
@@ -10,7 +10,7 @@
 [root]# python install.py
 
 ```
-安装中会有提示输入邮箱，部署数据库等操作。部署完成后即可使用部署基于tornado。
+安装中会有提示输入邮箱，部署数据库等操作。部署完成后即可使用，网络服务基于tornado。
 
 服务启用操作：
 ```shell
@@ -19,9 +19,9 @@
 [root]# bash service.sh stop # 关闭服务
 ```
 # 功能
-1. 博客使用markdown
+1. 博客使用markdown文本编辑器
 2. 首页查看用户活跃状态
-3. 采集用户端数据
+3. 采集用户端数据，并生成图表
 4. 邮箱推送文章，用户回复通过邮箱提醒
 5. 第三方QQ登录
 6. 博客设置隐私，只有管理员能够在主页查看并显示
@@ -29,11 +29,20 @@
 8. mysql数据备份
 9. 文件上传下载功能，简洁网盘
 
-# 升级
+# 展示
+![](http://yangxiao.online/static/files/20190407-200856-b64e/QQ浏览器截图20190407200840.png)
+![](http://yangxiao.online/static/files/20190407-201239-7c9a/QQ浏览器截图20190407200922.png)
+![](http://yangxiao.online/static/files/20190407-201247-a69e/QQ浏览器截图20190407200949.png)
+![](http://yangxiao.online/static/files/20190407-201255-8b86/QQ浏览器截图20190407201003.png)
+![](http://yangxiao.online/static/files/20190407-201304-135f/QQ浏览器截图20190407201034.png)
+![](http://yangxiao.online/static/files/20190407-201312-730f/QQ浏览器截图20190407201056.png)
+![](http://yangxiao.online/static/files/20190407-201324-4ec2/QQ浏览器截图20190407201148.png)
+![](http://yangxiao.online/static/files/20190407-201332-905f/QQ浏览器截图20190407201210.png)
+![](http://yangxiao.online/static/files/20190407-201340-cd14/QQ浏览器截图20190407201229.png)
+#升级
 - 2018-12-8基本功能完成
 
-# 说明
--  后台前端模板来源于[苏晓信](http://www.sxxblog.com/ "苏晓信")
-- 本人qq: 1270009836
+#说明
+- QQ: 1270009836
 
 

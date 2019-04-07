@@ -269,6 +269,17 @@ def blog_index(request):
     if request.session.get('role_id', '') == 0:
         papers = Paper.objects.filter(status=1).order_by('-id')[:10]
     else:
+        ip = get_client_ip(request)
+        try:
+            uid = request.COOKIES.get('uid',-1)
+            ret = get_area(ip)
+            agent = request.META.get('HTTP_USER_AGENT','')
+            _,agent = get_client_type(agent)
+            if ret.get('status', 1) == 0:
+                view_log = Viewlog(uid=uid, ip=ip, pid=0,lon=ret['content']['point']['x'], lat=ret['content']['point']['y'], agent=agent, province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'])
+                view_log.save()
+        except:
+            pass
         papers = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by('-id')[:10]
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
