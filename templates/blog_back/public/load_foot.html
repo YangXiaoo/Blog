@@ -1,0 +1,53 @@
+{% load common_func %}
+<footer class="main-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="widget">
+                    <h4 class="title"><i class="fa fa-paper-plane-o">网站地图</i></h4>
+                    <div class="content tag-cloud">
+                        {% for c in ''|web_map %}
+                                <a href="{% url 'category_detail' %}?cid={{ c.id }}"  target="_blank" title="{{ c.category_name }}">
+                            {{ c.category_name }}
+                        </a>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="widget">
+                    <h4 class="title"><i class="fa fa-chain">常用链接</i></h4>
+                    <div class="content tag-cloud">
+
+                        {% for b in  ''|blogroll %}
+                            <a href="{{ b.web_link }}"  target="_blank" title="{{ b.web_name }}">
+                                {{ b.web_name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="widget">
+                    <h4 class="title">关于我</h4>
+                    <div class="content">
+                        {{ 'copyright'|get_config|safe }}
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <span>{{ 'record'|get_config|safe }}</span>
+            </div>
+        </div>
+    </div>
+</div>

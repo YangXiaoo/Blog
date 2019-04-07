@@ -1,0 +1,31 @@
+{% load common_func %}
+<ol class="list-unstyled" style="font-size:20px;">
+	{% ifequal request.session.role_id 0 %}
+	{% for c in "-paper_total"|category:1 %}
+	<li>
+		<a href="{% url 'category_detail' %}?cid={{ c.id }}">
+			<span class="label label-info pull-right">
+				{{ c.paper_total }}
+			</span>
+			<i class="fa  fa-folder-open-o"></i>
+			{{ c.category_name }}
+		</a>
+	</li>
+	{% endfor %}
+	{% else %}
+	{% for c in "-paper_total"|category:0 %}
+	<li>
+		<a href="{% url 'category_detail' %}?cid={{ c.id }}">
+			<span class="label label-info pull-right">
+				{{ c.paper_total }}
+			</span>
+			<i class="fa  fa-folder-open-o"></i>
+			{{ c.category_name }}
+		</a>
+	</li>
+	{% endfor %}
+	{% endifequal %}
+</ol> 
+
+
+

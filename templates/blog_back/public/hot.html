@@ -1,0 +1,23 @@
+{% load common_func %}
+<ol class="list-unstyled" style="font-size:18px;">
+	{% ifequal request.session.role_id 0 %}
+    {% for p in "-comment_total"|hot_paper:1 %}
+    <li>
+        <a {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
+                    href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">
+            <i class="fa fa-paper-plane-o"></i> 
+            {{ p.title }}
+        </a>
+    </li>
+    {% endfor %}
+    {% else %}
+    {% for p in "-comment_total"|hot_paper:0 %}
+    <li>
+        <a href="{% url 'paper_detail' %}?pid={{ p.id }}">
+            <i class="fa fa-paper-plane-o"></i> 
+            {{ p.title }}
+        </a>
+    </li>
+    {% endfor %}
+    {% endifequal %}
+</ol>
