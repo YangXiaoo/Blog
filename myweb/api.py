@@ -156,6 +156,16 @@ def reply_user(cid,ruid):
         return 0
     return 1
 
+def truncation_desc(_description, lens=30):
+    if len(_description) == 0:
+        return "oops,没有描述"
+    if len(_description) > lens:
+        _description = _description[:lens] + "..."
+    else:
+        while len(_description) < lens:
+            _description = _description + "&nbsp;"
+    return _description
+
 
 class OAuthQQ:
     def __init__(self):
@@ -213,3 +223,4 @@ class OAuthQQ:
 
         response = urllib2.urlopen(url).read()
         return json.loads(response)
+

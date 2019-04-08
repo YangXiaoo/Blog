@@ -8,6 +8,16 @@
 .box-footer{border-top-left-radius:0;border-top-right-radius:0;border-bottom-right-radius:3px;border-bottom-left-radius:3px;border-top:1px solid #f4f4f4;padding:10px;background-color:#fff}
 
 
+a:link,
+a:hover {
+	text-decoration: none;
+}
+
+a:visited {
+	color: #278d6d;
+	text-decoration: none;
+}
+
 /*bolg-sidebar*/
 .blog-sidebar a:link {
 	color: #000000;
@@ -19,3 +29,37 @@
 	text-decoration: none;
 }
 
+
+.blog-sidebar a:visited {
+	color: #278d6d;
+	text-decoration: none;
+}
+
+
+
+/*article detail*/
+.share a:link{
+	color: #2da436;
+	text-decoration: none;
+}
+
+.share a:hover{
+	color: #ff0404;
+	text-decoration: none;
+}
+
+.comments a:link {
+	color: #0e5532;
+	text-decoration: none;
+}
+
+.comments a:hover {
+	color: #d56522;
+	text-decoration: none;
+}
+
+.avatar a:link,
+.avatar a:hover {
+	color: #151515;
+	text-decoration: none;
+}

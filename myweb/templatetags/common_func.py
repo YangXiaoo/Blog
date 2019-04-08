@@ -93,14 +93,14 @@ def preview(par,nums=None):
             left = Paper.objects.filter(Q(data__lt=paper.data)&Q(status=1)&Q(secrete=0)).order_by('data')
             right = Paper.objects.filter(Q(data__gt=paper.data)&Q(status=1)&Q(secrete=0)).order_by('-data')
     if left:
-        left_paper = u"""<a href="/blog/paper_detail/?pid=%s"><i class="fa fa-chevron-left"></i>%s</a>""" % (left[0].id, left[0].title)
+        left_paper = u"""<a href="/blog/paper_detail/?pid=%s" class="label label-badge label-success"><i class="fa fa-chevron-left"></i>%s</a>""" % (left[0].id, left[0].title)
     else:
-        left_paper = """<span><i class="fa fa-exclamation"></i>到头了</span>"""
+        left_paper = """<span class="label label-badge label-danger">><i class="fa fa-exclamation"></i>到头了</span>"""
     if right:
-        right_paper = u"""<a href="/blog/paper_detail/?pid=%s">%s<i class="fa fa-chevron-right"></i></a>""" % (right[0].id, right[0].title)
+        right_paper = u"""<a href="/blog/paper_detail/?pid=%s" class="label label-badge label-success">>%s<i class="fa fa-chevron-right"></i></a>""" % (right[0].id, right[0].title)
     else:
-        right_paper = """<span><i class="fa fa-exclamation"></i>到底了</span>"""
-    return """<span class="pull-left">%s</span><span class="pull-right">%s</span>""" % (left_paper, right_paper)
+        right_paper = """<span class="label label-badge label-danger">><i class="fa fa-exclamation"></i>到底了</span>"""
+    return """<span class="pull-left label label-badge label-success">>%s</span><span class="pull-right label label-badge label-success">>%s</span>""" % (left_paper, right_paper)
 
 
 @register.filter

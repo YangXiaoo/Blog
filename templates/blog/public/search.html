@@ -1,5 +1,7 @@
-{% include 'blog/public/top.html' %}
-{% include 'blog/public/load_header.html' %}
+{% extends 'blog/public/base.html' %}
+
+{% block content %}
+{% load common_func %}
 <div class="container">
     <div class="blog-header">
         <h1 class="blog-title">搜索结果</h1>
@@ -23,8 +25,8 @@
                     </a>
                     <div class="tags font-ei ">
                         <i class="fa fa-tags" title="文章标签：{{ p.category }}" data-toggle="tooltip"> {{ p.category }}</i>&nbsp;
-                        <i class="fa fa-clock-o" title="时间：{{ p.date|date:"Y-m-j" }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>&nbsp;
-                        <i class="fa fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>&nbsp;
+                        <i class="fa fa-clock-o" title="时间：{{ p.date|date:'Y-m-j' }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>&nbsp;
+                        <i class="icon icon-comments" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>&nbsp;
                         <i class="fa fa-thumbs-o-up" title="点赞：{{ p.like }}" data-toggle="tooltip" > {{ p.like }}</i>&nbsp;
                     </div>
             
@@ -34,22 +36,12 @@
         </div><!-- /.blog-main -->
 
         <!-- sidebar -->
-        <div class="col-sm-2 col-sm-offset-1 blog-sidebar">
-            <div class="sidebar-module sidebar-module-inset alert alert-warning"  role="alert">
-                <h4>注意！</h4>
-                <p>著作版权归本网站所有，若有侵权，请联系。</p>
-            </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
 
-            <div class="sidebar-module">
-                <h4 class="bs-callout bs-callout-info" >文档分类</h4>{% include 'blog/public/cate.html' %}
-            </div><hr>
-            <div class="sidebar-module">
-                <h4 class="bs-callout bs-callout-danger">热门文章</h4>
-                {% include 'blog/public/hot.html' %}
-            </div><hr>
+            {% include "blog/public/sidebar.html" %}
         </div><!-- /.blog-sidebar -->
 
     </div><!-- /.row -->
 
 </div><!-- /.container -->
-{% include 'blog/public/bottom.html' %}
+{% endblock %}

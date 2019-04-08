@@ -19,6 +19,8 @@ from admin.api import require_login,send_mail, get_client_type
 from email.mime.text import MIMEText
 from email.header import Header
 
+import markdown as md 
+
 WEB_URL = 'http://yangxiao.online'
 WEB_TITLE = '杨潇-博客'
 OLD_URL = ['www.lxa.kim', 'lxa.kim', 'www.lxxx.site', 'lxxx.site']
@@ -254,6 +256,8 @@ def blog_index(request):
         # return render_to_response('blog/paper_load_more.html', locals())
         ret = ''
         for p in papers:
+            _description = p.description
+            p.description = truncation_desc(_description)
             if p.is_jump == 0:
                 ret += u"""<div class="list-arc-item "><a href="/blog/paper_detail/?pid=%s" title="%s"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.id, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
             else:
@@ -281,6 +285,9 @@ def blog_index(request):
         except:
             pass
         papers = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by('-id')[:10]
+        for paper in papers:
+            _description = paper.description
+            paper.description = truncation_desc(_description)
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
 
 @common
@@ -301,6 +308,9 @@ def category_detail(request):
                 papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)&Q(secrete=0)).order_by('-id')
             else:
                 papers = Paper.objects.filter(Q(cid=cid)&Q(status=1)).order_by('-id')
+            for paper in papers:
+                _description = paper.description
+                paper.description = truncation_desc(_description)
             return render_to_response('blog/category/category_detail.html', locals(), context_instance=RequestContext(request))
     elif request.method == "POST":
         cid = request.POST.get('id', '')
@@ -322,6 +332,8 @@ def category_detail(request):
             papers = papers[start : start + 10]
             ret = ''
             for p in papers:
+                _description = p.description
+                p.description = truncation_desc(_description)
                 if p.is_jump == 0:
                     ret += u"""<div class="list-arc-item "><a href="/blog/paper_detail/?pid=%s" title="%s"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.id, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
                 else:
@@ -366,6 +378,23 @@ def paper_detail(request):
                 preview_show = preview(pid, 1)
             else:
                 preview_show = preview(pid, 0)
+
+            # markdown转换为html
+            # lines = p.content.split("\n")
+            # for line in lines:
+            #     if line[:3] == "```":
+            #         if line[3:]:
+            #             line = "<pre class=\"brush:{};\"".format(line[3:])
+            #         else:
+            #             line = "</pre>"
+            # p.content = "\n".join(lines)
+            tmp = p.content
+            # tmp = tmp.replace("```cpp", "<pre class=\"brush: cpp;\"")
+            # tmp = tmp.replace("```python", "<pre class=\"brush: python;\"")
+            # tmp = tmp.replace("```java", "<pre class=\"brush: java;\"")
+            # tmp = tmp.replace("```", "</pre>")
+            content = md.markdown(tmp)
+            p.content = content
             return render_to_response('blog/paper/paper_detail.html', locals(), context_instance=RequestContext(request))
     elif request.method == "POST":
         pid = request.POST.get('id', '')
@@ -472,7 +501,7 @@ def blog_thumbs(request):
             if int(kind) == 0:
                 thumb = Thumbs.objects.filter(Q(pid=pid)&Q(uid=uid)&Q(ip=ip)&Q(is_dislike=1))
                 if thumb:
-                    info = "为什么要点两次...."
+                    info = "为什么要点两次???"
                 else:
                     agent = request.META.get('HTTP_USER_AGENT','')
                     _,agent = get_client_type(agent)
@@ -480,7 +509,7 @@ def blog_thumbs(request):
                     thumb.save()
                     paper.dislike += 1
                     paper.save()
-                    info = "emmmmmmmmmmm...."
+                    info = "emmm...."
             else:
                 thumb = Thumbs.objects.filter(Q(pid=pid)&Q(ip=ip)&Q(uid=uid)&Q(is_dislike=0))
                 if thumb:
@@ -563,21 +592,21 @@ def preview(par,nums=None):
         # 可以看到隐私
         if paper:
             # 又是一个bug date写成data了
-            left = Paper.objects.filter(Q(id__lt=paper.id)&Q(status=1)&Q(is_jump=0)).order_by('id')
-            right = Paper.objects.filter(Q(id__gt=paper.id)&Q(status=1)&Q(is_jump=0)).order_by('id')
+            left = Paper.objects.filter(Q(id__lt=paper.id)&Q(status=1)).order_by('-id')
+            right = Paper.objects.filter(Q(id__gt=paper.id)&Q(status=1)).order_by('id')
     elif nums == 0:
         if paper:
-            left = Paper.objects.filter(Q(id__lt=paper.id)&Q(status=1)&Q(secrete=0)&Q(is_jump=0)).order_by('id')
-            right = Paper.objects.filter(Q(id__gt=paper.id)&Q(status=1)&Q(secrete=0)&Q(is_jump=0)).order_by('id')
+            left = Paper.objects.filter(Q(id__lt=paper.id)&Q(status=1)&Q(secrete=0)).order_by('-id')
+            right = Paper.objects.filter(Q(id__gt=paper.id)&Q(status=1)&Q(secrete=0)).order_by('id')
     if left:
-        left_paper = u"""<a href="/blog/paper_detail/?pid=%s"><i class="fa fa-chevron-left"></i>%s</a>""" % (left[0].id, left[0].title)
+        left_paper = u"""<a href="/blog/paper_detail/?pid=%s" class="label label-badge label-success"><i class="fa fa-chevron-left"></i>%s</a>""" % (left[0].id, left[0].title)
     else:
-        left_paper = u"""<span><i class="fa fa-exclamation"></i>到头了</span>"""
+        left_paper = u"""<span class="label label-badge label-danger"><i class="fa fa-exclamation"></i>到头了</span>"""
     if right:
-        right_paper = u"""<a href="/blog/paper_detail/?pid=%s">%s<i class="fa fa-chevron-right"></i></a>""" % (right[0].id, right[0].title)
+        right_paper = u"""<a href="/blog/paper_detail/?pid=%s" class="label label-badge label-success">%s<i class="fa fa-chevron-right"></i></a>""" % (right[0].id, right[0].title)
     else:
-        right_paper = u"""<span><i class="fa fa-exclamation"></i>到底了</span>"""
-    return u"""<span class="pull-left">%s</span><span class="pull-right">%s</span>""" % (left_paper, right_paper)
+        right_paper = u"""<span class="label label-badge label-danger"><i class="fa fa-exclamation"></i>到底了</span>"""
+    return u"""<span class="pull-left label label-badge label-success">%s</span><span class="pull-right label label-badge label-success">%s</span>""" % (left_paper, right_paper)
 
 
 

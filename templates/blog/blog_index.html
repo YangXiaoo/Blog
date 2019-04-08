@@ -16,7 +16,7 @@
 					  <img src="{{ 'web_logo'|get_config }}" height="400px" alt="">
                       </div>
 					  <div class="card-heading"><strong>{{ p.title }}</strong></div>
-					  <div class="card-content text-muted">{{ p.description }}</div>
+					  <div class="card-content text-muted">{{ p.description|safe }}</div>
 					  <div class="card-actions">
 					    <span class="label label-primary">
 					    	<i class="fa fa-lemon-o" title="标签：{{ p.category }}" data-toggle="tooltip"> {{ p.category }}</i> 

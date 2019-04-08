@@ -1,0 +1,51 @@
+{% extends 'blog/public/base.html' %}
+
+{% block content %}
+{% load common_func %}
+<div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title"><span>共{{ paper_total }}篇</span></h1>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+
+            <div class="blog-post">
+                <br>
+                {% for c in cate %}
+                <h3>{{ c.category_name }}</h3>
+                <ul>
+                    {% ifequal request.session.role_id 0 %}
+                    {% for p in c.id|paper_list:0 %}
+                    <li class="fa fa-paper-plane-o">
+                        <a {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
+                    href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">{{ p.title }}</a>
+                    </li>
+                    <br>
+                    {% endfor %}
+
+                    {% else %}
+
+                    {% for p in c.id|paper_list:1 %}
+                    <li class="fa fa-paper-plane-o">
+                        <a href="{% url 'paper_detail' %}?pid={{ p.id }}" >{{ p.title }}</a>
+                    </li>
+                    <br>
+                    {% endfor %}
+                    {% endifequal %}
+                </ul>
+                <hr>
+                {% endfor %}
+            </div>
+        </div><!-- /.blog-main -->
+
+        <!-- sidebar -->
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+            {% include "blog/public/sidebar.html" %}
+        </div><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+{% endblock %}
