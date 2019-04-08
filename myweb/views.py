@@ -192,14 +192,23 @@ def sign(request):
     if request.method == "POST":
         password = request.POST.get('password', '')
         repassword = request.POST.get('repassword', '')
+
+        # 输入验证
         if password != repassword:
             error = "两次密码输入不相同"
             return render_to_response('blog/sign.html',{'error':error})
         username = request.POST.get('username', '')
         email = request.POST.get('email', '')
+        if not username or not email:
+            error = "邮箱或用户输出错误！"
+            return render_to_response('blog/sign.html',{'error':error})
         user = getObject(Users, username=username)
         if user:
             error = "用户存在"
+            return render_to_response('blog/sign.html',{'error':error})
+        user = getObject(Users, email=email)
+        if user:
+            error = "邮箱已存在！"
             return render_to_response('blog/sign.html',{'error':error})
 
         config = Config.objects.all()
@@ -256,12 +265,12 @@ def blog_index(request):
         # return render_to_response('blog/paper_load_more.html', locals())
         ret = ''
         for p in papers:
-            _description = p.description
-            p.description = truncation_desc(_description)
+            # _description = p.description
+            # p.description = truncation_desc(_description)
             if p.is_jump == 0:
-                ret += u"""<div class="list-arc-item "><a href="/blog/paper_detail/?pid=%s" title="%s"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.id, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+                ret += u"""<div class="col-md-6 col-sm-12 col-lg-6"><a class="card" href="/blog/paper_detail/?pid=%s" title="%s"><div align="center"><img src="%s" height="350px" alt=""></div><div class="card-heading"><strong>%s</strong></div><div class="card-content text-muted">%s</div><div class="card-actions"><span class="label label-primary"><i class="fa fa-lemon-o" title="标签：%s" data-toggle="tooltip">%s</i></span>&nbsp;<span class="label label-success"><i class="fa fa-clock-o" title="时间：%s" data-toggle="tooltip" >%s</i></span>&nbsp;<span class="label label-info"><i class="icon icon-comments" title="评论：%s" data-toggle="tooltip" >%s</i></span><div class="pull-right"><span class="label label-warning"><i class="icon-heart-empty" title="点赞：%s" data-toggle="tooltip" >%s</i></span></div></div></a></div>""" % (p.id, p.title, choose_img(p.id), p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
             else:
-                ret += u"""<div class="list-arc-item "><a href="%s" title="%s" target="_blank"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.jumplink, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+                ret += u"""<div class="col-md-6 col-sm-12 col-lg-6"><a class="card" href="%s" title="%s" target="_blank"><div align="center"><img src="%s" height="350px" alt=""></div><div class="card-heading"><strong>%s</strong></div><div class="card-content text-muted">%s</div><div class="card-actions"><span class="label label-primary"><i class="fa fa-lemon-o" title="标签：%s" data-toggle="tooltip">%s</i></span>&nbsp;<span class="label label-success"><i class="fa fa-clock-o" title="时间：%s" data-toggle="tooltip" >%s</i></span>&nbsp;<span class="label label-info"><i class="icon icon-comments" title="评论：%s" data-toggle="tooltip" >%s</i></span><div class="pull-right"><span class="label label-warning"><i class="icon-heart-empty" title="点赞：%s" data-toggle="tooltip" >%s</i></span></div></div></a></div>""" % (p.jumplink, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
         # ret = render_to_response('blog/paper_load_more.html', locals())
         # return HttpResponse((ret))
         status = [1, 0][len(papers) == 0]
@@ -285,10 +294,31 @@ def blog_index(request):
         except:
             pass
         papers = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by('-id')[:10]
-        for paper in papers:
-            _description = paper.description
-            paper.description = truncation_desc(_description)
+    for paper in papers:
+        _description = paper.description
+        paper.description = truncation_desc(_description)
     return render_to_response('blog/blog_index.html', locals(), context_instance=RequestContext(request))
+
+
+def timeline(request):
+    """时间轴"""
+    if request.session.get('role_id', '') == 0:
+        papers = Paper.objects.filter(status=1).order_by('-id')
+    else:
+        ip = get_client_ip(request)
+        try:
+            uid = request.COOKIES.get('uid',-1)
+            ret = get_area(ip)
+            agent = request.META.get('HTTP_USER_AGENT','')
+            _,agent = get_client_type(agent)
+            if ret.get('status', 1) == 0:
+                view_log = Viewlog(uid=uid, ip=ip, pid=0,lon=ret['content']['point']['x'], lat=ret['content']['point']['y'], agent=agent, province=ret['content']['address_detail']['province'],city=ret['content']['address_detail']['city'])
+                view_log.save()
+        except:
+            pass
+        papers = Paper.objects.filter(Q(status=1)&Q(secrete=0)).order_by('-id')
+    return render_to_response('blog/paper/timeline.html', locals(), context_instance=RequestContext(request))
+
 
 @common
 def category_detail(request):
@@ -332,12 +362,11 @@ def category_detail(request):
             papers = papers[start : start + 10]
             ret = ''
             for p in papers:
-                _description = p.description
-                p.description = truncation_desc(_description)
                 if p.is_jump == 0:
-                    ret += u"""<div class="list-arc-item "><a href="/blog/paper_detail/?pid=%s" title="%s"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.id, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+                    ret += u"""<div class="col-md-6 col-sm-12 col-lg-6"><a class="card" href="/blog/paper_detail/?pid=%s" title="%s"><div align="center"><img src="%s" height="350px" alt=""></div><div class="card-heading"><strong>%s</strong></div><div class="card-content text-muted">%s</div><div class="card-actions"><span class="label label-primary"><i class="fa fa-lemon-o" title="标签：%s" data-toggle="tooltip">%s</i></span>&nbsp;<span class="label label-success"><i class="fa fa-clock-o" title="时间：%s" data-toggle="tooltip" >%s</i></span>&nbsp;<span class="label label-info"><i class="icon icon-comments" title="评论：%s" data-toggle="tooltip" >%s</i></span><div class="pull-right"><span class="label label-warning"><i class="icon-heart-empty" title="点赞：%s" data-toggle="tooltip" >%s</i></span></div></div></a></div>""" % (p.id, p.title, choose_img(p.id), p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
                 else:
-                    ret += u"""<div class="list-arc-item "><a href="%s" title="%s" target="_blank"><div class="list-box"><h3>%s</h3><div class="info">%s</div></div></a><div class="tags font-ei "><i class="fa fa-lemon-o" title="tag：%s" data-toggle="tooltip"> %s</i>&nbsp;<i class="fa fa-clock-o" title="time：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-commenting-o" title="comment：%s" data-toggle="tooltip" > %s</i>&nbsp;<i class="fa fa-thumbs-o-up" title="like：%s" data-toggle="tooltip" > %s</i>&nbsp;</div></div><hr>""" % (p.jumplink, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+                    ret += u"""<div class="col-md-6 col-sm-12 col-lg-6"><a class="card" href="%s" title="%s" target="_blank"><div align="center"><img src="%s" height="350px" alt=""></div><div class="card-heading"><strong>%s</strong></div><div class="card-content text-muted">%s</div><div class="card-actions"><span class="label label-primary"><i class="fa fa-lemon-o" title="标签：%s" data-toggle="tooltip">%s</i></span>&nbsp;<span class="label label-success"><i class="fa fa-clock-o" title="时间：%s" data-toggle="tooltip" >%s</i></span>&nbsp;<span class="label label-info"><i class="icon icon-comments" title="评论：%s" data-toggle="tooltip" >%s</i></span><div class="pull-right"><span class="label label-warning"><i class="icon-heart-empty" title="点赞：%s" data-toggle="tooltip" >%s</i></span></div></div></a></div>""" % (p.jumplink, p.title, p.title, p.description, p.category, p.category, p.data, p.data, p.comment_total, p.comment_total, p.like, p.like)
+                    
             status = [1, 0][len(papers) == 0]
             return HttpResponse(json.dumps({
                         "status": status,
@@ -378,23 +407,6 @@ def paper_detail(request):
                 preview_show = preview(pid, 1)
             else:
                 preview_show = preview(pid, 0)
-
-            # markdown转换为html
-            # lines = p.content.split("\n")
-            # for line in lines:
-            #     if line[:3] == "```":
-            #         if line[3:]:
-            #             line = "<pre class=\"brush:{};\"".format(line[3:])
-            #         else:
-            #             line = "</pre>"
-            # p.content = "\n".join(lines)
-            tmp = p.content
-            # tmp = tmp.replace("```cpp", "<pre class=\"brush: cpp;\"")
-            # tmp = tmp.replace("```python", "<pre class=\"brush: python;\"")
-            # tmp = tmp.replace("```java", "<pre class=\"brush: java;\"")
-            # tmp = tmp.replace("```", "</pre>")
-            content = md.markdown(tmp)
-            p.content = content
             return render_to_response('blog/paper/paper_detail.html', locals(), context_instance=RequestContext(request))
     elif request.method == "POST":
         pid = request.POST.get('id', '')
@@ -414,36 +426,38 @@ def paper_detail(request):
             for c in comments:
                 user_info = getObject(Users, id=c.uid)
                 ruser_info = getObject(Users, id=c.ruid)
-                user_login = request.session.get('user_id', False)
-                ret += u"""<div class="box-comment"><img src="%s" alt="%s" class="img-circle img-md""><div class="comment-text"><span  class="username"><a href="#" target="_blank">%s</a><span class="text-muted pull-right"><i class="fa fa-clock-o"></i> %s</span></span>%s""" % (user_info.profile, user_info.profile, user_info.username, c.data, c.content)
+                user_login = request.session.get('user_id', -1)
+                ret += u"""<div class="comment"><a href="#" alt="%s" class="avatar"><img src="%s" width="30px" height="30px"></a><div class="content"><div class="pull-right text-muted"><i class="fa fa-clock-o"></i>%s</div><div><a href="###"><strong>%s</strong></a></div><div class="text">%s</div>""" % (user_info.username, user_info.profile, c.data, user_info.username, c.content)
 
-                if user_login:
-                    ret += u"""<br><div class=""><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btn pull-right"><i class="fa fa-mail-reply "></i>回复</a></div>""" % (c.uid, c.id)
+                if user_login != -1:
+                    ret += u"""<div class="actions"><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btn">回复</a></div>""" % (c.uid, c.id)
+                ret += u"</div>"
+
                 if is_reply(c.id) == 1:
-                    ret += "<hr>"
+                    ret += u"""<div class="comments-list">"""
+                    for r in reply(c.id):
+                        if r != 0:
+                            user = getObject(Users, id=r.uid)
+                            ruser = getObject(Users, id=r.ruid)
+                            ret += u"""<div class="comment"><a href="###" class="avatar"><img src="%s" width="30px" height="30px"></a><div class="content"><div class="pull-right text-muted"><i class="fa fa-clock-o">%s</i></div><div><a href="###"><strong>%s</strong></a>""" % (user.profile, r.data, user.username)
 
-                for r in reply(c.id):
-                    if r != 0:
-                        user = getObject(Users, id=r.uid)
-                        ruser = getObject(Users, id=r.ruid)
-                        ret += u"""<div class="box-comment"><img src="%s" alt="%s"  class="img-circle img-md"><div class="comment-text"><span  class="username"><a href="#" target="_blank">%s</a><span class="text-muted pull-right"><i class="fa fa-clock-o">%s</i></span></span>""" % (user.profile, user.profile, user.username, r.data)
+                            if reply_user(r.id, c.uid) == 1:
+                                ret += """<span class="text-muted">回复</span> <a href="###">%s</a>""" % ruser.username
 
-                        if reply_user(r.id, c.uid) == 1:
-                            ret += """<a href="#" class="font-blue">@%s</a><br>""" % ruser.username
+                            ret += u"""</div><div class="text">%s</div><div class="actions">""" % (r.content)
 
-                        ret += r.content + "</div>"
-
-                        if user_login:
-                            ret += """<div class=""><a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btnpull-right"><i class="fa fa-mail-reply "></i>回复</a></div>""" % (r.uid, c.id)
-                        ret += "</div>"
-                ret += "</div>" + "</div>"
+                            if user_login != -1:
+                                ret += u"""<a href="javascript:void(0);" data-ruid="%s" data-pcid="%s" class="arc-btn">回复</a>""" % (r.uid, c.id)
+                            ret += u"</div></div></div>"
+                    ret += u"</div>"
+                ret += u"</div>"
 
             status = [1, 0][len(comments) == 0]
             return HttpResponse(json.dumps({
                         "status": status,
                         "info": ret
                     })) 
-    error = '没有找到资源。。。。。。。'
+    error = '没有找到资源......'
     return render_to_response('blog/error/404.html',{'error':error})
 
 
@@ -612,3 +626,15 @@ def preview(par,nums=None):
 
 def old_url(request):
     return render_to_response('old_url.html')
+
+
+
+def choose_img(pid):
+    """返回文章封面"""
+    paper = getObject(Paper, id=pid)
+    if paper.litpic:
+        return paper.litpic
+    else:
+        config = Config.objects.all()
+        if config:
+            return config[0].default_img

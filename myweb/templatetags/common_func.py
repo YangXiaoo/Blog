@@ -32,6 +32,17 @@ def get_config(par):
 
 
 @register.filter
+def get_paper_img(pid):
+    """返回文章封面"""
+    paper = getObject(Paper, id=pid)
+    if paper.litpic:
+        return paper.litpic
+    else:
+        config = Config.objects.all()
+        if config:
+            return config[0].default_img
+
+@register.filter
 def category(par,nums):
     if nums == 0:
         cate = Category.objects.filter(Q(status=1)&Q(secrete=0)).order_by(str(par))

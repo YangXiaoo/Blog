@@ -182,7 +182,8 @@ def admin_index(request):
         data[v.agent] = data.get(v.agent, 0) + 1
     for k,v in data.items():
         brower_data.append(v)
-        brower_data_lables.append([k, 'other'][k  == ''])
+        if k:
+            brower_data_lables.append(k)
         tmp_color = []
         for i in range(3):
             tmp_color.append(str(random.randint(0,255)))
@@ -277,18 +278,32 @@ def category_edit_inline(request):
 
 @admin_require_login
 def category_del(request):
+    """删除分类"""
     if request.method == "POST":
         fid = request.POST.get('id', '')
         fid = fid.split(',')
         try:
+            """删除与之相关的文章与评论"""
             for k in fid:
                 f = getObject(Viewlog, id=k)
                 papers = Paper.objects.filter(cid=f.id)
                 for p in papers:
+                    comments = Comment.objects.filter(pid=p.id)
+                    try:
+                        for comment in comments:
+                            comment.delete()
+                    except:
+                        pass
+                    thumbs = Thumbs.objects.filter(pic=p.id)
+                    try:
+                        for t in thumbs:
+                            t.delete()
+                    except:
+                        pass
                     p.delete()
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -456,12 +471,28 @@ def paper_del(request):
         try:
             for k in fid:
                 f = getObject(Paper, id=k)
-                category = getObject(Category, id=f.cid)
-                category.paper_total -= 1
-                category.save()
+                try:
+                    category = getObject(Category, id=f.cid)
+                    category.paper_total -= 1
+                    category.save()
+                except:
+                    pass
+                try:
+                    comments = Comment.objects.filter(pid=f.id)
+                    for comment in comments:
+                        comment.delete()
+                except:
+                    pass
+
+                try:
+                    thumbs = Thumbs.objects.filter(pic=p.id)
+                    for t in thumbs:
+                        t.delete()
+                except:
+                    pass
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -494,7 +525,7 @@ def email_test(request):
         try:
             if test_mail(e):
                 status = 1
-                info = 'email test successful!'
+                info = '邮箱测试成功！'
             else:
                 status = 0
                 info = 'fail'
@@ -569,7 +600,7 @@ def email_del(request):
                 f = getObject(Emailsetting, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -632,7 +663,7 @@ def admin_upload_image(request):
                 for chunk in upload_file.chunks():
                     f.write(chunk)
             url = WEB_URL + file_path.split(BASE_DIR)[-1]
-        info = "upload file successful!"
+        info = "成功上传！"
         success = 1
     except Exception as e:
         info = str(e)
@@ -710,7 +741,7 @@ def user_add(request):
         try:
             user.save()
             status = 1
-            info = 'successful!'
+            info = '成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -756,7 +787,7 @@ def user_edit(request):
         try:
             user.save()
             status = 1
-            info = 'successful!'
+            info = '成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -794,7 +825,7 @@ def user_edit_inline(request):
             user.is_admin = admin
         user.save()
         status = 1
-        info = 'successful!'
+        info = '成功！'
     except:
         status = 0
         info = 'fail'
@@ -813,7 +844,7 @@ def user_del(request):
                 f = getObject(Users, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -878,7 +909,7 @@ def comment_edit_inline(request):
         c.status = status
         c.save()
         status = 1
-        info = 'successful!'
+        info = '成功！'
     except:
         status = 0
         info = 'fail'
@@ -896,12 +927,15 @@ def comment_del(request):
         try:
             for k in fid:
                 f = getObject(Comment, id=k)
-                paper = getObject(Paper, id=f.pid)
-                paper.comment_total -= 1
-                paper.save()
+                try:
+                    paper = getObject(Paper, id=f.pid)
+                    paper.comment_total -= 1
+                    paper.save()
+                except:
+                    pass
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -937,7 +971,7 @@ def web_config(request):
                     u.profile = data['default_img']
                     u.save()
             status = 1
-            info = 'successful!'
+            info = '成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -990,10 +1024,10 @@ def file_edit_inline(request):
     try:
         file.save()
         status = 1
-        info = 'ok'
+        info = '修改成功'
     except:
         status = 0
-        info = 'fail'
+        info = '修改失败'
     return HttpResponse(json.dumps({
                 "status": status,
                 "info": info
@@ -1010,7 +1044,7 @@ def web_file_del(request):
                 f = getObject(UpFiles, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1037,7 +1071,7 @@ def login_del(request):
                 f = getObject(Loginlog, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1069,7 +1103,7 @@ def view_log_del(request):
                 f = getObject(Viewlog, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1098,7 +1132,7 @@ def blogroll_add(request):
             r = Blogroll(**data)
             r.save()
             status = 1
-            info = 'successful!'
+            info = '成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1121,7 +1155,7 @@ def blogroll_edit(request):
         try:
             Blogroll.objects.filter(id=rid).update(**data)
             status = 1
-            info = 'successful!'
+            info = '成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1154,10 +1188,10 @@ def blogroll_edit_inline(request):
             blog.status = status
         blog.save()
         status = 1
-        info = 'successful!'
+        info = '成功！'
     except:
         status = 0
-        info = 'fail'
+        info = '失败！'
     return HttpResponse(json.dumps({
                 "status": status,
                 "info": info
@@ -1174,7 +1208,7 @@ def blogroll_del(request):
                 f = getObject(Blogroll, id=k)
                 f.delete()
             status = 1
-            info = 'delete successful!'
+            info = '删除成功！'
         except Exception as e:
             status = 0
             info = str(e)
@@ -1228,7 +1262,7 @@ def database_recover(request):
                 if ret != 0:
                     ret = bash('mysqldump %s < %s' % (DB_DATABASE, f.file_path))
                 status = 1
-                info = 'database recover successful!'
+                info = 'database recover 成功！'
             else:
                 info = '暂时只支持mysql数据库的还原'
                 status = 0

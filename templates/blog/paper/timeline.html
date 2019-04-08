@@ -1,0 +1,58 @@
+{% extends 'blog/public/base.html' %}
+
+{% block content %}
+{% load common_func %}
+<div class="container">
+    <div class="blog-header">
+        <h2>时间轴</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+            <div class="row">
+                <div class="timeline timeline-line-dotted">
+                    {% for p in papers %}
+                    <span class="timeline-label">
+                        <span class="label label-primary">{{ p.data }}</span>
+                    </span>
+                    <div class="timeline-item">
+                        <div class="timeline-point timeline-point-blank"></div>
+                        <div class="timeline-event timeline-event-default">
+                            <div class="timeline-heading">
+                                <a {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
+                    href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}"><h4>{{ p.title }}</h4></a>
+                            </div>
+                            <div class="timeline-body">
+                                <p>{{ p.description|safe }}</p>
+                            </div>
+                            <div class="timeline-footer">
+                                <p class="text-right"><i class="fa fa-lemon-o" title="标签：{{ p.category }}" data-toggle="tooltip"> {{ p.category }}</i></p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <span class="timeline-label">
+                        <a href="#" class="btn btn-default" title="More...">
+                            <i class="fa fa-fw fa-history"></i>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <br>
+
+        </div><!-- /.blog-main -->
+
+        <!-- sidebar -->
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+            {% include "blog/public/sidebar.html" %}
+        </div><!-- /.blog-sidebar -->
+
+    </div><!-- /.row -->
+
+</div><!-- /.container -->
+
+{% endblock %}
+
+{% block temp_resource %}
+<link rel="stylesheet" href="/static/css/timeline.css" />
+{% endblock %}

@@ -6,7 +6,7 @@
         <div class="col-sm-7">
             <select class="form-control select2" name="typeid" style="width:100%;">
                 {% for c in cate %}
-                <option value="{{ c.id }}" {% ifequal c.id p.id%} selected="selected" {% endifequal %} {% ifequal c.id cid %} selected="selected" {% endifequal %}>{{ c.category_name }}</option>
+                <option value="{{ c.id }}" {% ifequal c.id p.cid%} selected="selected" {% endifequal %} {% ifequal c.id cid %} selected="selected" {% endifequal %}>{{ c.category_name }}</option>
                 {% endfor %}
             </select>
         </div>

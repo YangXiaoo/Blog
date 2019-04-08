@@ -160,10 +160,10 @@ def truncation_desc(_description, lens=30):
     if len(_description) == 0:
         return "oops,没有描述"
     if len(_description) > lens:
-        _description = _description[:lens] + "..."
+        _description = _description[:lens] + u"..."
     else:
         while len(_description) < lens:
-            _description = _description + "&nbsp;"
+            _description = _description + u"..."
     return _description
 
 

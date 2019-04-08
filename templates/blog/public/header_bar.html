@@ -1,22 +1,25 @@
 {% load common_func %}
-<nav class="navbar navbar-default" role="navigation" id="nav-head">
-    <div class="container-fluid">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="nav-head">
+    <div class="container container-fluid">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Blog</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'blog_index' %}" style="padding: 10px 10px 10px 10px"><img src="{{ 'web_logo'|get_config }}" width="30px" height="30px"></a>
+            <a class="navbar-brand" href="{% url 'blog_index' %}"> Yauno</a>
         </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" >
+        <div class="collapse navbar-collapse" id="navbar-collapse-1" >
             <ul class="nav navbar-nav ">
                 <li>
                     <a href="{% url 'blog_index' %}">文章</a>
                 </li>
                 <li> 
                     <a href="{% url 'blog_category_list' %}">目录</a>
+                </li>
+                <li> 
+                    <a href="{% url 'timeline' %}">时间轴</a>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -25,24 +28,33 @@
                 <a href="{% url 'login' %}"><i class="icon icon-user"></i></a>
             </li>
             {% else %}
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    <i class="icon icon-user"></i> 
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li align="center">你好, &nbsp;<span>{{ request.COOKIES.username }}</span>
-                    </li>
-                    <li align="center">
-                        <a href="#">信息中心</a>
-                    </li>
-                    <li align="center">
-                        <a href="{% url 'logout' %}">退出</a>
-                    </li>
-                </ul>
-            </li>
+            <li><a href="#"> 你好, &nbsp;<span>{{ request.COOKIES.username }}</span></a></li>
+            <li><a href="{% url 'logout' %}">退出</a></li>
             {% endif %}
           </ul>
         </div>
     </div>
 </nav>
+<script type="text/javascript">
+        // nav bar scroll
+    var new_scroll_position = 0;
+    var last_scroll_position;
+    var header = document.getElementById("nav-head");
+
+    window.addEventListener('scroll', function(e) {
+        last_scroll_position = window.scrollY;
+
+        // Scrolling down
+        if (new_scroll_position < last_scroll_position && last_scroll_position > 80) {
+            header.classList.remove("slideDown");
+            header.classList.add("slideUp");
+
+        // Scrolling up
+        } else if (new_scroll_position > last_scroll_position) {
+            // header.removeClass('slideUp').addClass('slideDown');
+            header.classList.remove("slideUp");
+            header.classList.add("slideDown");
+        }
+        new_scroll_position = last_scroll_position;
+    });
+</script>

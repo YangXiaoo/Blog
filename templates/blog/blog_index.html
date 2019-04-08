@@ -3,18 +3,21 @@
 {% block content %}
 {% load common_func %}
 <div class="container">
+        <div class="blog-header">
+        &nbsp;
+        </div>
     <div class="row">
         <div class="col-sm-8 blog-main">
             <div class="blog-post">
             <br>
-            <div class="cards">
+            <div class="cards new-load-box">
                 {% for p in papers %}
                 <div class="col-md-6 col-sm-12 col-lg-6">
                 	<a class="card " {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
                     href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">
                     <div align="center">
-					  <img src="{{ 'web_logo'|get_config }}" height="400px" alt="">
-                      </div>
+					  <img src="{{ p.id|get_paper_img }}" height="350px" alt="">
+                      </div> 
 					  <div class="card-heading"><strong>{{ p.title }}</strong></div>
 					  <div class="card-content text-muted">{{ p.description|safe }}</div>
 					  <div class="card-actions">
@@ -36,8 +39,6 @@
 					</a>
                 </div>
                 {% endfor %}
-        
-                <div class="new-load-box"></div>
             </div>
                     <div style="padding: 30px 0px 30px 0px;">
                         <button class="btn btn-block btn-success" id="new-load-btn" data-page="2" data-id="0" data-url="{% url 'blog_index' %}"

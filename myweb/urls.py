@@ -20,6 +20,7 @@ urlpatterns = patterns('myweb.views',
     url(r'^blog/blog_search/$', 'blog_search', name='blog_search'),
     url(r'^blog/thumbs/$', 'blog_thumbs', name='blog_thumbs'),
     url(r'^blog/paper_comment/$', 'paper_comment', name='paper_comment'),
+    url(r'^blog/timeline', 'timeline', name='timeline'),
 
     url(r'^admin/', include('admin.urls')),
     url(r'.*', 'request_error', name='request_error'),
