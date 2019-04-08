@@ -30,20 +30,22 @@
 9. 文件上传下载功能，简洁网盘
 
 # 展示
-![](http://yangxiao.online/static/files/20190408-230943-80b9/TIM截图20190408230831.png)
-![](http://yangxiao.online/static/files/20190408-230950-6ede/TIM截图20190408230848.png)
-![](http://yangxiao.online/static/files/20190407-200856-b64e/QQ浏览器截图20190407200840.png)
-![](http://yangxiao.online/static/files/20190407-201239-7c9a/QQ浏览器截图20190407200922.png)
-![](http://yangxiao.online/static/files/20190407-201247-a69e/QQ浏览器截图20190407200949.png)
-![](http://yangxiao.online/static/files/20190407-201255-8b86/QQ浏览器截图20190407201003.png)
-![](http://yangxiao.online/static/files/20190407-201304-135f/QQ浏览器截图20190407201034.png)
-![](http://yangxiao.online/static/files/20190407-201312-730f/QQ浏览器截图20190407201056.png)
-![](http://yangxiao.online/static/files/20190407-201324-4ec2/QQ浏览器截图20190407201148.png)
-![](http://yangxiao.online/static/files/20190407-201332-905f/QQ浏览器截图20190407201210.png)
-![](http://yangxiao.online/static/files/20190407-201340-cd14/QQ浏览器截图20190407201229.png)
+![](static/other/TIM截图20190408230831.png)
+![](static/other/TIM截图20190408230848.png)
+![](static/other/QQ浏览器截图20190407200840.png)
+![](static/other/QQ浏览器截图20190407200922.png)
+![](static/other/QQ浏览器截图20190407200949.png)
+![](static/other/QQ浏览器截图20190407201003.png)
+![](static/other/QQ浏览器截图20190407201034.png)
+![](static/other/QQ浏览器截图20190407201056.png)
+![](static/other/QQ浏览器截图20190407201148.png)
+![](static/other/QQ浏览器截图20190407201210.png)
+![](static/other/QQ浏览器截图20190407201229.png)
+
 #升级
 - 2018-12-8 基本功能完成
 - 2019-4-8 博客前端使用`ZUI`框架，并修复一些BUG
+
 #说明
 - 本人QQ: 1270009836
 
