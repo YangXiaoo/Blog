@@ -1,4 +1,4 @@
-#Blog
+# Blog
 [首页链接](http://yangxiao.online "首页链接")
 [后台首页](http://yangxiao.online/admin/ "后台首页")
 
@@ -42,11 +42,11 @@
 ![](static/other/QQ浏览器截图20190407201210.png)
 ![](static/other/QQ浏览器截图20190407201229.png)
 
-#升级
+# 升级
 - 2018-12-8 基本功能完成
 - 2019-4-8 博客前端使用`ZUI`框架，并修复一些BUG
 
-#说明
+# 说明
 - 本人QQ: 1270009836
 
 
