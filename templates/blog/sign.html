@@ -3,10 +3,12 @@
 {% block content %}
 {% load common_func %}
 <div class="container">
+    <div class="blog-header">
+        <h1 class="blog-title"></h1>
+    </div>
     <div class="row">
         <div class="col-sm-8 blog-main">
-            <div class="blog-post">
-            <br>
+            <div class="blog-post"><br>
                 {% if error %}
                 <div class="alert alert-danger text-center">
                     {{ error }}
@@ -43,7 +45,6 @@
                             <input class="form-control" name="email" placeholder="邮箱">
                         </div>
                     </div>
-
 <!--                     <div class="row form-group">
                         <label class="col-sm-3 control-label">验证码</label>
                         <div class="col-sm-7">
@@ -53,7 +54,6 @@
                             </div>
                         </div>
                     </div> -->
-
                     <div class="row">
                         <div class="col-sm-3"></div>
                         <div class="col-sm-7">
@@ -65,16 +65,16 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </form><hr><br>
 
                 <div>
                     <span>第三方登录</span>
                     <a href="#" style="color:#ff0000;}">&nbsp;<i class="fa fa-weibo"></i></a>
-                    <a href="{% url 'qq_login' %}" class="third-way" style="color:#0099ff">
+                    <a href="{% url 'qq_login' %}" class="third-way" style="color:#0099ff;">
                         <i class="fa fa-qq"></i>
                         <span class="bg qq"></span>
                     </a>
-                    <a href="{% url 'sign' %}" class="third-way pull-right" style="color:#0066ff">注册
+                    <a href="{% url 'sign' %}" class="third-way pull-right" style="color:#0066ff;">注册
                     </a>
                 </div>
                 <hr>
@@ -86,7 +86,6 @@
 
             {% include "blog/public/sidebar.html" %}
         </div>
-
     </div><!-- /.row -->
 
 </div><!-- /.container -->
