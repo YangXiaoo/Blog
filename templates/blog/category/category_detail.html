@@ -3,8 +3,8 @@
 {% block content %}
 {% load common_func %}
 <div class="container">
-    <div class="blog-header">
-        <h1 class="blog-title">{{ category_name }}</h1>
+    <div class="blog-header" >
+        <h1 ><span class="label label-success">{{ category_name }}</span></h1>
     </div>
 
     <div class="row">
@@ -20,7 +20,7 @@
                       <img src="{{ p.id|get_paper_img }}" height="300px" alt="">
                       </div>
                       <div class="card-heading"><strong>{{ p.title }}</strong></div>
-                      <div class="card-content text-muted">{{ p.description }}</div>
+                      <div class="card-content text-muted">{{ p.description|safe }}</div>
                       <div class="card-actions">
                         <span class="label label-primary">
                             <i class="fa fa-lemon-o" title="标签：{{ p.category }}" data-toggle="tooltip"> {{ p.category }}</i> 
@@ -29,10 +29,9 @@
                             <i class="fa fa-clock-o" title="时间：{{ p.data|date:'Y-m-j' }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>
                         </span>&nbsp;
                         <span class="label label-info">
-                            <i class="icon icon-comments" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>
+                            <i class="fa fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>
                         </span>
-
-                        <div class="pull-right">                        
+                        <div class="pull-right">                
                             <span class="label label-warning">
                             <i class="icon-heart-empty" title="点赞：{{ p.like }}" data-toggle="tooltip" > {{ p.like }}</i>
                         </span></div>
@@ -52,6 +51,7 @@
 
         <!-- sidebar -->
         <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+
             {% include "blog/public/sidebar.html" %}
         </div><!-- /.blog-sidebar -->
 
