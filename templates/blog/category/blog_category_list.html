@@ -14,26 +14,55 @@
                 <br>
                 {% for c in cate %}
                 <h3>{{ c.category_name }}</h3>
-                <ul>
+                <div class="cards new-load-box">
                     {% ifequal request.session.role_id 0 %}
                     {% for p in c.id|paper_list:0 %}
-                    <li class="fa fa-paper-plane-o">
-                        <a {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
-                    href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">{{ p.title }}</a>
-                    </li>
-                    <br>
+                    <div class="col-md-4 col-sm-12 col-lg-4">
+                        <a class="card " {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
+                        href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">
+                          <div class="card-heading"><strong>{{ p.title }}</strong></div>
+<!--                           <div class="card-content text-muted">{{ p.description|safe }}</div> -->
+                          <div class="card-actions">
+                            <span class="label label-success">
+                                <i class="fa fa-clock-o" title="时间：{{ p.data|date:'Y-m-j' }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>
+                            </span>&nbsp;
+                            <span class="label label-info">
+                                <i class="fa fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>
+                            </span>
+                            <div class="pull-right">                        
+                                <span class="label label-warning">
+                                <i class="icon-heart-empty" title="点赞：{{ p.like }}" data-toggle="tooltip" > {{ p.like }}</i>
+                            </span></div>
+                          </div>
+                        </a>
+                    </div>
                     {% endfor %}
 
                     {% else %}
 
                     {% for p in c.id|paper_list:1 %}
-                    <li class="fa fa-paper-plane-o">
-                        <a href="{% url 'paper_detail' %}?pid={{ p.id }}" >{{ p.title }}</a>
-                    </li>
-                    <br>
+                    <div class="col-md-4 col-sm-12 col-lg-4">
+                        <a class="card " {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
+                        href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">
+                          <div class="card-heading"><strong>{{ p.title }}</strong></div>
+<!--                           <div class="card-content text-muted">{{ p.description|safe }}</div> -->
+                          <div class="card-actions">
+                            <span class="label label-success">
+                                <i class="fa fa-clock-o" title="时间：{{ p.data|date:'Y-m-j' }}" data-toggle="tooltip" > {{ p.data|date:"Y-m-j" }}</i>
+                            </span>&nbsp;
+                            <span class="label label-info">
+                                <i class="fa fa-commenting-o" title="评论：{{ p.comment_total }}" data-toggle="tooltip" > {{ p.comment_total }}</i>
+                            </span>
+                            <div class="pull-right">                        
+                                <span class="label label-warning">
+                                <i class="icon-heart-empty" title="点赞：{{ p.like }}" data-toggle="tooltip" > {{ p.like }}</i>
+                            </span></div>
+                          </div>
+                        </a>
+                    </div>
                     {% endfor %}
                     {% endifequal %}
-                </ul>
+                </div>
                 <hr>
                 {% endfor %}
             </div>
