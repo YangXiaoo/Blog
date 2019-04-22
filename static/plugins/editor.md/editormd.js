@@ -1473,7 +1473,7 @@
             
             if (settings.previewCodeHighlight) 
             {
-                previewContainer.find("pre").addClass("prettyprint linenums");
+                previewContainer.find("pre").addClass("prettyprint");
                 
                 if (typeof prettyPrint !== "undefined")
                 {                    
@@ -3995,7 +3995,7 @@
             
         if (settings.previewCodeHighlight) 
         {
-            div.find("pre").addClass("prettyprint linenums");
+            div.find("pre").addClass("prettyprint");
             prettyPrint();
         }
         
