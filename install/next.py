@@ -36,7 +36,7 @@ class Setup(object):
     def _update(): 
         try:
             mac = getMacAddress()
-            web = urllib.urlopen('https://www;lxa.kim' + str(mac))
+            web = urllib.urlopen('https://www.yangxiao.online' + str(mac))
         except:
             pass
 
