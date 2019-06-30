@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 # 2018-11-25
-
 import sys
 import os
 import django
