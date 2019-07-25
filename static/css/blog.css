@@ -92,3 +92,20 @@ a:hover {
 .font-red {
 	color: red;
 }
+
+.article {
+	padding: 20px 0px 20px 0px;
+	box-sizing: border-box;
+	box-shadow:0 0 2px #1e2a2a63;
+}
+
+
+.editormd-preview-container, .editormd-html-preview {
+	padding: 20px 0px 20px 0px;
+}
+
+/*bar-background color*/
+.navbar-inverse {
+    background-color: rgb(36, 38, 41);
+    border-color: rgb(9, 9, 9);
+}

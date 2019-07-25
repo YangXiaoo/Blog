@@ -8,7 +8,7 @@
     </div>
 
     <div class="row">
-        <div class="col-sm-8 blog-main">
+        <div class="col-sm-8 blog-main animate bounceInDown">
             <div class="blog-post">
             <br>
             <div class="cards">
@@ -17,7 +17,7 @@
                     <a class="card " {% ifequal p.is_jump 0 %} href="{% url 'paper_detail' %}?pid={{ p.id }}" {% else %} 
                     href="{{ p.jumplink }}" target="_blank" {% endifequal %} title="{{ p.title }}">
                     <div align="center">
-                      <img src="{{ p.id|get_paper_img }}" height="300px" alt="">
+                      <img src="{{ p.id|get_paper_img }}" height="250px" alt="">
                       </div>
                       <div class="card-heading"><strong>{{ p.title }}</strong></div>
                       <div class="card-content text-muted">{{ p.description|safe }}</div>
