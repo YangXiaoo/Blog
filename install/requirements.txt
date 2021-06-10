@@ -1,4 +1,4 @@
-django==1.6
+django==2.2.24
 pycrypto==2.4.1
 ecdsa==0.13
 MySQL-python==1.2.5
